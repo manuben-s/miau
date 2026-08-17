@@ -1,0 +1,342 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paloma — Visual Archive</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-gallery: #0a0908;
+      --panel-bg: #11100e;
+      --ink-white: #f5f0e6;
+      --ink-muted: #8c877c;
+      --rust-accent: #d95a2b;
+      
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+    }
+    
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+    }
+    
+    body {
+      background-color: var(--bg-gallery);
+      color: var(--ink-white);
+      font-family: var(--font-serif);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+      user-select: none;
+    }
+
+    /* --- NAVEGACIÓN --- */
+    header {
+      background: transparent;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 1.5rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      z-index: 50;
+    }
+
+    .brand {
+      color: var(--ink-white);
+      font-weight: 500;
+      letter-spacing: 0.18em;
+    }
+
+    nav ul {
+      display: flex;
+      list-style: none;
+      gap: 2.5rem;
+    }
+
+    nav a {
+      color: var(--ink-muted);
+      text-decoration: none;
+      transition: color 0.3s ease;
+      position: relative;
+    }
+
+    nav a:hover, nav a.active {
+      color: var(--ink-white);
+    }
+
+    nav a.active::after {
+      content: "";
+      position: absolute;
+      bottom: -6px;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: var(--ink-white);
+    }
+
+    /* --- CONTENEDOR DE LA GALERÍA --- */
+    main {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      padding: 2rem 3rem 4rem;
+      max-width: 1500px;
+      margin: 0 auto;
+      width: 100%;
+    }
+
+    .gallery-header {
+      margin-bottom: 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: flex-end;
+    }
+
+    .gallery-title {
+      font-size: 2.5rem;
+      font-weight: 300;
+      letter-spacing: 0.05em;
+      color: var(--ink-white);
+    }
+
+    .gallery-meta {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      color: var(--ink-muted);
+      text-transform: uppercase;
+    }
+
+    /* --- CUADRÍCULA BENTO --- */
+    .bento-grid {
+      display: grid;
+      grid-template-columns: repeat(12, 1fr);
+      grid-template-rows: repeat(2, 35vh);
+      gap: 1.5rem;
+      flex: 1;
+    }
+
+    .window-photo  { grid-column: 1 / 5; grid-row: 1 / 3; } 
+    .window-video  { grid-column: 5 / 13; grid-row: 1 / 2; } 
+    .window-coll   { grid-column: 5 / 9; grid-row: 2 / 3; }  
+    .window-illust { grid-column: 9 / 11; grid-row: 2 / 3; } 
+    .window-draw   { grid-column: 11 / 13; grid-row: 2 / 3; } 
+
+    /* --- ESTILO DEL EXPOSITOR --- */
+    .expositor {
+      position: relative;
+      background: var(--panel-bg);
+      border: 1px solid rgba(255, 255, 255, 0.08);
+      border-radius: 4px;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      justify-content: flex-end;
+      padding: 2rem;
+      text-decoration: none;
+      transition: border-color 0.4s ease, transform 0.4s ease, box-shadow 0.4s ease;
+      box-shadow: inset 0 0 40px rgba(0, 0, 0, 0.8);
+      cursor: pointer;
+    }
+
+    .glass-reflection {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(135deg, rgba(255,255,255,0.06) 0%, transparent 40%, transparent 60%, rgba(255,255,255,0.02) 100%);
+      z-index: 5;
+      pointer-events: none;
+    }
+
+    .expositor-media {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      opacity: 0.35;
+      filter: grayscale(40%);
+      transition: transform 0.8s cubic-bezier(0.16, 1, 0.3, 1), opacity 0.6s ease, filter 0.6s ease;
+      z-index: 1;
+    }
+
+    .expositor-overlay {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(to top, rgba(10, 9, 8, 0.95) 0%, rgba(10, 9, 8, 0.2) 60%, transparent 100%);
+      z-index: 2;
+    }
+
+    .expositor:hover {
+      border-color: rgba(255, 255, 255, 0.3);
+      box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5), inset 0 0 20px rgba(0, 0, 0, 0.9);
+      transform: translateY(-4px);
+    }
+
+    .expositor:hover .expositor-media {
+      transform: scale(1.06);
+      opacity: 0.75;
+      filter: grayscale(0%);
+    }
+
+    .expositor:hover .info-num {
+      color: var(--rust-accent);
+    }
+
+    /* --- TEXTOS DEL EXPOSITOR --- */
+    .expositor-info {
+      position: relative;
+      z-index: 10;
+      display: flex;
+      flex-direction: column;
+      gap: 0.4rem;
+    }
+
+    .info-num {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.15em;
+      color: var(--ink-muted);
+      transition: color 0.4s ease;
+    }
+
+    .info-title {
+      font-size: 1.8rem;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      color: var(--ink-white);
+    }
+
+    /* --- RESPONSIVE --- */
+    @media (max-width: 1100px) {
+      .bento-grid {
+        grid-template-columns: repeat(2, 1fr);
+        grid-template-rows: auto;
+      }
+      .window-photo, .window-video, .window-coll, .window-illust, .window-draw {
+        grid-column: span 1;
+        grid-row: auto;
+        min-height: 300px;
+      }
+      .window-video { grid-column: span 2; }
+    }
+
+    @media (max-width: 768px) {
+      header { padding: 1.5rem; flex-direction: column; gap: 1rem; }
+      main { padding: 1.5rem; }
+      .bento-grid { grid-template-columns: 1fr; }
+      .window-photo, .window-video, .window-coll, .window-illust, .window-draw {
+        grid-column: span 1;
+      }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+  <header>
+    <div class="brand">Paloma</div>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="visual.html" class="active">Visual</a></li>
+        <li><a href="audio.html">Audio</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="products.html">Products</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- MAIN GALLERY -->
+  <main>
+    <div class="gallery-header">
+      <h1 class="gallery-title">Visual Archive</h1>
+      <div class="gallery-meta">Exhibition Rooms</div>
+    </div>
+
+    <div class="bento-grid">
+      
+      <!-- 01. PHOTOGRAPHY -->
+      <a href="photography.html" class="expositor window-photo">
+        <div class="glass-reflection"></div>
+        <img class="expositor-media" src="images/photo/below/6.jpg" alt="Photography">
+        <div class="expositor-overlay"></div>
+        <div class="expositor-info">
+          <span class="info-num">01 / LENS</span>
+          <h2 class="info-title">Photography</h2>
+        </div>
+      </a>
+
+      <!-- 02. VIDEO -->
+      <a href="videos.html" class="expositor window-video">
+        <div class="glass-reflection"></div>
+        <video class="expositor-media" src="images/video_1.mp4#t=9.25" autoplay loop muted playsinline></video>
+        <div class="expositor-overlay"></div>
+        <div class="expositor-info">
+          <span class="info-num">02 / MOTION</span>
+          <h2 class="info-title">Video</h2>
+        </div>
+      </a>
+
+      <!-- 03. COLLAGES -->
+      <a href="collages.html" class="expositor window-coll">
+        <div class="glass-reflection"></div>
+        <img class="expositor-media" src="images/collage_5.jpg" alt="Collages">
+        <div class="expositor-overlay"></div>
+        <div class="expositor-info">
+          <span class="info-num">03 / MIXED</span>
+          <h2 class="info-title">Collages</h2>
+        </div>
+      </a>
+
+      <!-- 04. ILLUSTRATION -->
+      <a href="illustration.html" class="expositor window-illust">
+        <div class="glass-reflection"></div>
+        <img class="expositor-media" src="images/illustration_2_1.png" alt="Illustration">
+        <div class="expositor-overlay"></div>
+        <div class="expositor-info">
+          <span class="info-num">04 / DIGITAL</span>
+          <h2 class="info-title">Illustration</h2>
+        </div>
+      </a>
+
+      <!-- 05. DRAWINGS -->
+      <a href="drawings.html" class="expositor window-draw">
+        <div class="glass-reflection"></div>
+        <img class="expositor-media" src="images/drawing_2.jpg" alt="Drawings">
+        <div class="expositor-overlay"></div>
+        <div class="expositor-info">
+          <span class="info-num">05 / PAPER</span>
+          <h2 class="info-title">Drawings</h2>
+        </div>
+      </a>
+
+    </div>
+  </main>
+
+  <script>
+    document.addEventListener("DOMContentLoaded", () => {
+      const videoCard = document.querySelector('.window-video');
+      const video = videoCard.querySelector('video');
+
+      if(video) {
+        video.pause();
+        videoCard.addEventListener('mouseenter', () => video.play());
+        videoCard.addEventListener('mouseleave', () => video.pause());
+      }
+    });
+  </script>
+
+</body>
+</html>
