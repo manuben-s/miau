@@ -1,0 +1,635 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paloma — Collages</title>
+  
+  <!-- Typography -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=IBM+Plex+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --desk-base: #141311;
+      --desk-mat: #181614;
+      --tape-cream: rgba(235, 222, 195, 0.72);
+      --tape-blue: rgba(43, 92, 143, 0.75);
+      --tape-orange: rgba(224, 90, 43, 0.82);
+      --ink-white: #f4f0e6;
+      --ink-muted: #807a70;
+      --rust: #d95a2b;
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--desk-base);
+      color: var(--ink-white);
+      font-family: var(--font-serif);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* --- TOP NAVIGATION --- */
+    header {
+      background: #0d0c0b;
+      border-bottom: 1px solid #24211d;
+      padding: 1.1rem 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      z-index: 50;
+    }
+
+    .brand {
+      color: var(--ink-white);
+      font-weight: 500;
+      letter-spacing: 0.18em;
+    }
+
+    nav ul {
+      display: flex;
+      list-style: none;
+      gap: 2rem;
+    }
+
+    nav a {
+      color: var(--ink-muted);
+      text-decoration: none;
+      transition: color 0.25s ease;
+    }
+
+    nav a:hover,
+    nav a.active {
+      color: var(--ink-white);
+    }
+
+    /* --- METADATA & DESK TOOLBAR --- */
+    .top-meta {
+      padding: 1rem 2.5rem 0.2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+      z-index: 40;
+    }
+
+    .top-meta .section-tag {
+      color: var(--rust);
+      font-weight: 500;
+    }
+
+    .desk-actions {
+      display: flex;
+      align-items: center;
+      gap: 1.2rem;
+    }
+
+    .action-btn {
+      background: none;
+      border: 1px solid #332e28;
+      color: #9c9486;
+      padding: 0.35rem 0.75rem;
+      border-radius: 3px;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.12em;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: all 0.2s ease;
+    }
+
+    .action-btn:hover {
+      color: var(--ink-white);
+      border-color: var(--ink-muted);
+      background: rgba(255, 255, 255, 0.04);
+    }
+
+    /* --- WORKBENCH TABLE SURFACE --- */
+    main {
+      flex: 1;
+      position: relative;
+      overflow: hidden;
+      cursor: default;
+    }
+
+    .workbench-surface {
+      position: absolute;
+      inset: 0.8rem 1.8rem 1.5rem;
+      border-radius: 6px;
+      background-color: var(--desk-mat);
+      /* Subtle wood/fiber texture and warm studio lamp highlight */
+      background-image: 
+        radial-gradient(ellipse 70% 60% at 25% 30%, rgba(220, 100, 45, 0.07) 0%, transparent 60%),
+        radial-gradient(circle at 75% 70%, rgba(35, 50, 70, 0.25) 0%, transparent 70%),
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noiseFilter'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.8' numOctaves='3' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noiseFilter)' opacity='0.045'/%3E%3C/svg%3E");
+      box-shadow: 
+        inset 0 0 100px rgba(0, 0, 0, 0.85),
+        0 0 0 1px rgba(255, 255, 255, 0.04);
+      overflow: hidden;
+    }
+
+    /* --- DRAGGABLE SCRAP / COLLAGE ITEM --- */
+    .scrap-item {
+      position: absolute;
+      display: inline-block;
+      cursor: grab;
+      touch-action: none;
+      transition: transform 0.15s ease, filter 0.15s ease;
+      filter: drop-shadow(0 10px 18px rgba(0, 0, 0, 0.55));
+    }
+
+    .scrap-item:active {
+      cursor: grabbing;
+    }
+
+    .scrap-item.is-dragging {
+      filter: drop-shadow(0 25px 35px rgba(0, 0, 0, 0.85)) !important;
+      transform: scale(1.03) !important;
+    }
+
+    /* Inner Paper Card */
+    .scrap-card {
+      position: relative;
+      background: #f4efe4;
+      padding: 8px 8px 12px;
+      border-radius: 2px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.2);
+      pointer-events: auto;
+    }
+
+    /* Transparent cutouts (like collage_8.png) stay boundary-free */
+    .scrap-item.raw-cutout .scrap-card {
+      background: transparent;
+      padding: 0;
+      box-shadow: none;
+    }
+
+    /* Visual Media inside Scrap */
+    .scrap-media {
+      display: block;
+      width: auto;
+      height: auto;
+      max-height: 28vh;
+      max-width: 280px;
+      object-fit: contain;
+      pointer-events: none;
+      border-radius: 1px;
+    }
+
+    /* --- MASKING TAPE STRIPS --- */
+    .tape {
+      position: absolute;
+      height: 18px;
+      width: 55px;
+      background: var(--tape-cream);
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.25);
+      z-index: 5;
+      pointer-events: none;
+      backdrop-filter: blur(1px);
+    }
+
+    .tape.tape-tl {
+      top: -9px;
+      left: -12px;
+      transform: rotate(-35deg);
+    }
+
+    .tape.tape-tr {
+      top: -9px;
+      right: -12px;
+      transform: rotate(30deg);
+    }
+
+    .tape.tape-blue {
+      background: var(--tape-blue);
+    }
+
+    .tape.tape-orange {
+      background: var(--tape-orange);
+    }
+
+    /* --- EMBOSSED LABEL / DYMO TAG --- */
+    .dymo-label {
+      position: absolute;
+      bottom: -10px;
+      left: 12px;
+      background: #11100f;
+      color: #ede8df;
+      font-family: var(--font-mono);
+      font-size: 0.58rem;
+      letter-spacing: 0.14em;
+      padding: 2px 8px;
+      border-radius: 2px;
+      box-shadow: 0 2px 5px rgba(0, 0, 0, 0.6);
+      text-transform: uppercase;
+      pointer-events: none;
+      white-space: nowrap;
+      z-index: 6;
+      border: 1px solid rgba(255, 255, 255, 0.1);
+    }
+
+    .dymo-label.dymo-rust {
+      background: #2b1710;
+      color: #ffaa82;
+      border-color: rgba(217, 90, 43, 0.4);
+    }
+
+    /* --- LIGHTBOX MODAL --- */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(10, 9, 8, 0.96);
+      backdrop-filter: blur(14px);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+      padding: 2rem;
+      cursor: zoom-out;
+    }
+
+    .lightbox.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .lightbox-content {
+      position: relative;
+      max-width: 90vw;
+      max-height: 84vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: default;
+    }
+
+    .lightbox-content img,
+    .lightbox-content video {
+      max-width: 88vw;
+      max-height: 78vh;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      box-shadow: 0 25px 65px rgba(0, 0, 0, 0.95);
+      border-radius: 2px;
+      transform: scale(0.96);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .lightbox.active .lightbox-content img,
+    .lightbox.active .lightbox-content video {
+      transform: scale(1);
+    }
+
+    .lightbox-caption {
+      margin-top: 1.2rem;
+      color: var(--ink-white);
+      font-family: var(--font-serif);
+      font-size: 1.2rem;
+      text-align: center;
+      letter-spacing: 0.03em;
+    }
+
+    .lightbox-caption span {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--rust);
+      letter-spacing: 0.15em;
+      margin-top: 0.3rem;
+      text-transform: uppercase;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 2rem;
+      right: 2.5rem;
+      background: none;
+      border: none;
+      color: var(--ink-muted);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.15em;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: color 0.2s ease;
+    }
+
+    .lightbox-close:hover {
+      color: var(--ink-white);
+    }
+    /* --- MENÚ DESPLEGABLE UNIVERSAL --- */
+    .dropdown { position: relative; }
+    .dropdown-content {
+      display: none; position: absolute; top: 100%; left: -15px;
+      background-color: #0a0908; min-width: 140px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+      border: 1px solid #211e19; border-radius: 2px;
+      z-index: 100; overflow: hidden;
+    }
+    .dropdown:hover .dropdown-content { display: block; }
+    .dropdown-content a {
+      color: #8c877c; padding: 12px 18px; text-decoration: none;
+      display: block; font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem;
+      border-bottom: 1px solid #1a1714; transition: background 0.2s, color 0.2s;
+    }
+    .dropdown-content a:last-child { border-bottom: none; }
+    .dropdown-content a:hover {
+      background-color: #161411; color: #f4f0e6;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- TOP HEADER -->
+<header>
+    <div class="brand">Paloma</div>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li class="dropdown">
+          <a href="visual.html" class="active">Visual</a>
+          <div class="dropdown-content">
+            <a href="visual.html">Photography</a>
+            <a href="illustration.html">Illustration</a>
+            <a href="drawings.html">Drawings</a>
+            <a href="collages.html">Collages</a>
+            <a href="video.html">Video</a>
+          </div>
+        </li>
+        <li><a href="audio.html">Audio</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="products.html">Products</a></li>
+      </ul>
+    </nav>
+  </header>
+  
+  <!-- METADATA & WORKBENCH TOOLBAR -->
+  <div class="top-meta">
+    <div>Visual / <span class="section-tag">Collages</span> & Mixed media</div>
+    <div class="desk-actions">
+      <span>[ Drag to arrange • Click to expand ]</span>
+      <button class="action-btn" onclick="scatterScraps()">Scatter</button>
+      <button class="action-btn" onclick="tidyDesk()">Reset</button>
+    </div>
+  </div>
+
+  <!-- MAIN WORKBENCH SURFACE -->
+  <main>
+    <div class="workbench-surface" id="workbench">
+
+      <!-- 01: JPG -->
+      <div class="scrap-item" data-title="01" data-meta="2025" data-type="image" data-src="images/collage_1.jpg">
+        <div class="scrap-card">
+          <div class="tape tape-tl tape-orange"></div>
+          <img class="scrap-media" src="images/collage_1.jpg" alt="Collage 01">
+          <div class="dymo-label">[01]</div>
+        </div>
+      </div>
+
+      <!-- 02: JPG -->
+      <div class="scrap-item" data-title="02" data-meta="2025" data-type="image" data-src="images/collage_2.jpg">
+        <div class="scrap-card">
+          <div class="tape tape-tr tape-blue"></div>
+          <img class="scrap-media" src="images/collage_2.jpg" alt="Collage 02">
+          <div class="dymo-label">[02]</div>
+        </div>
+      </div>
+
+      <!-- 03: JPG -->
+      <div class="scrap-item" data-title="03" data-meta="2025" data-type="image" data-src="images/collage_3.jpg">
+        <div class="scrap-card">
+          <div class="tape tape-tl"></div>
+          <img class="scrap-media" src="images/collage_3.jpg" alt="Collage 03">
+          <div class="dymo-label">[03]</div>
+        </div>
+      </div>
+
+      <!-- 04: MP4 (VIDEO LOOP) -->
+      <div class="scrap-item" data-title="04" data-meta="2026" data-type="video" data-src="images/collage_4.mp4">
+        <div class="scrap-card">
+          <div class="tape tape-tr tape-orange"></div>
+          <video class="scrap-media" src="images/collage_4.mp4" autoplay loop muted playsinline></video>
+          <div class="dymo-label dymo-rust">[04]</div>
+        </div>
+      </div>
+
+      <!-- 05: JPG -->
+      <div class="scrap-item" data-title="05" data-meta="2025" data-type="image" data-src="images/collage_5.jpg">
+        <div class="scrap-card">
+          <div class="tape tape-tl tape-blue"></div>
+          <img class="scrap-media" src="images/collage_5.jpg" alt="Collage 05">
+          <div class="dymo-label">[05]</div>
+        </div>
+      </div>
+
+      <!-- 06: JPG -->
+      <div class="scrap-item" data-title="06" data-meta="2025" data-type="image" data-src="images/collage_6.jpg">
+        <div class="scrap-card">
+          <div class="tape tape-tr"></div>
+          <img class="scrap-media" src="images/collage_6.jpg" alt="Collage 06">
+          <div class="dymo-label">[06]</div>
+        </div>
+      </div>
+
+      <!-- 07: JPG -->
+      <div class="scrap-item" data-title="07" data-meta="2025" data-type="image" data-src="images/collage_7.jpg">
+        <div class="scrap-card">
+          <div class="tape tape-tl tape-orange"></div>
+          <img class="scrap-media" src="images/collage_7.jpg" alt="Collage 07">
+          <div class="dymo-label">[07]</div>
+        </div>
+      </div>
+
+      <!-- 08: PNG (RAW CUTOUT) -->
+      <div class="scrap-item raw-cutout" data-title="08" data-meta="2026" data-type="image" data-src="images/collage_8.png">
+        <div class="scrap-card">
+          <div class="tape tape-tr tape-blue"></div>
+          <img class="scrap-media" src="images/collage_8.png" alt="Collage 08">
+          <div class="dymo-label">[08]</div>
+        </div>
+      </div>
+
+      <!-- 09: JPG -->
+      <div class="scrap-item" data-title="Collage 09" data-meta="Textile & Paper — 2026" data-type="image" data-src="images/collage_9.jpg">
+        <div class="scrap-card">
+          <div class="tape tape-tl"></div>
+          <img class="scrap-media" src="images/collage_9.jpg" alt="Collage 09">
+          <div class="dymo-label">[09]</div>
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <!-- FULLSCREEN LIGHTBOX -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+    <button class="lightbox-close" onclick="closeLightboxDirect()">[ Close / ESC ]</button>
+    <div class="lightbox-content">
+      <img id="lightboxImg" src="" alt="Enlarged Collage" style="display: none;">
+      <video id="lightboxVideo" src="" autoplay loop muted playsinline style="display: none;"></video>
+      <div class="lightbox-caption" id="lightboxCaption"></div>
+    </div>
+  </div>
+
+  <script>
+    const workbench = document.getElementById('workbench');
+    const scraps = document.querySelectorAll('.scrap-item');
+    let highestZ = 20;
+
+    // Presets for initial organic distribution across the desk
+    const defaultPositions = [
+      { x: 5,  y: 8,  r: -3.5 },
+      { x: 26, y: 14, r: 2.2 },
+      { x: 48, y: 6,  r: -1.8 },
+      { x: 70, y: 12, r: 4.0 },
+      { x: 12, y: 50, r: 3.2 },
+      { x: 34, y: 44, r: -2.5 },
+      { x: 56, y: 52, r: 1.5 },
+      { x: 76, y: 46, r: -4.2 },
+      { x: 42, y: 28, r: 0.8 }
+    ];
+
+    function tidyDesk() {
+      scraps.forEach((item, index) => {
+        const pos = defaultPositions[index] || { x: 20, y: 20, r: 0 };
+        item.style.left = `${pos.x}%`;
+        item.style.top = `${pos.y}%`;
+        item.style.transform = `rotate(${pos.r}deg)`;
+        item.style.zIndex = index + 1;
+      });
+      highestZ = scraps.length + 2;
+    }
+
+    function scatterScraps() {
+      scraps.forEach((item) => {
+        const rx = Math.random() * 72 + 4;
+        const ry = Math.random() * 55 + 6;
+        const rot = (Math.random() - 0.5) * 16;
+        item.style.left = `${rx}%`;
+        item.style.top = `${ry}%`;
+        item.style.transform = `rotate(${rot}deg)`;
+      });
+    }
+
+    // --- DRAG & DROP WITH TOUCH / POINTER ENGINE ---
+    scraps.forEach((item, index) => {
+      let isDragging = false;
+      let startX, startY, origX, origY;
+      let hasMoved = false;
+
+      item.addEventListener('pointerdown', (e) => {
+        isDragging = true;
+        hasMoved = false;
+        startX = e.clientX;
+        startY = e.clientY;
+        
+        origX = item.offsetLeft;
+        origY = item.offsetTop;
+
+        // Bring to front
+        highestZ++;
+        item.style.zIndex = highestZ;
+        item.classList.add('is-dragging');
+        item.setPointerCapture(e.pointerId);
+      });
+
+      item.addEventListener('pointermove', (e) => {
+        if (!isDragging) return;
+        const dx = e.clientX - startX;
+        const dy = e.clientY - startY;
+
+        if (Math.hypot(dx, dy) > 5) {
+          hasMoved = true;
+        }
+
+        item.style.left = `${origX + dx}px`;
+        item.style.top = `${origY + dy}px`;
+      });
+
+      item.addEventListener('pointerup', (e) => {
+        if (!isDragging) return;
+        isDragging = false;
+        item.classList.remove('is-dragging');
+        item.releasePointerCapture(e.pointerId);
+
+        // If it was a quick click without dragging -> open Lightbox
+        if (!hasMoved) {
+          const src = item.dataset.src;
+          const title = item.dataset.title;
+          const meta = item.dataset.meta;
+          const isVideo = item.dataset.type === 'video';
+          openLightbox(src, title, meta, isVideo);
+        }
+      });
+    });
+
+    // --- LIGHTBOX CONTROLS ---
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const lightboxVideo = document.getElementById('lightboxVideo');
+    const lightboxCaption = document.getElementById('lightboxCaption');
+
+    function openLightbox(src, title, meta, isVideo) {
+      if (isVideo) {
+        lightboxImg.style.display = 'none';
+        lightboxVideo.style.display = 'block';
+        lightboxVideo.src = src;
+      } else {
+        lightboxVideo.style.display = 'none';
+        lightboxImg.style.display = 'block';
+        lightboxImg.src = src;
+      }
+      lightboxCaption.innerHTML = `${title} <span>${meta}</span>`;
+      lightbox.classList.add('active');
+    }
+
+    function closeLightbox(e) {
+      if (e.target === lightbox) closeLightboxDirect();
+    }
+
+    function closeLightboxDirect() {
+      lightbox.classList.remove('active');
+      setTimeout(() => {
+        lightboxImg.src = '';
+        lightboxVideo.src = '';
+      }, 300);
+    }
+
+    document.addEventListener('keydown', (e) => {
+      if (e.key === 'Escape' && lightbox.classList.contains('active')) {
+        closeLightboxDirect();
+      }
+    });
+
+    // Initial setup on load
+    tidyDesk();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,705 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paloma — Video</title>
+  
+  <!-- Fonts: IBM Plex Mono for technical OSD/controls & Cormorant Garamond for titles -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=IBM+Plex+Mono:wght@300;400;500;600&family=VT323&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-room: #121110;              /* Dark ambient screening room */
+      --tv-body: #24201c;              /* Vintage Bakelite / dark chassis */
+      --tv-bezel: #181614;             /* Inner bezel frame */
+      --tv-screen-bg: #0a0c0e;         /* Deep tube black */
+      --crt-glow: rgba(60, 255, 120, 0.75); /* Retro green phosphor */
+      --amber-led: #e66025;            /* Power indicator lamp */
+      --ink-white: #f4f0e6;
+      --ink-muted: #888276;
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+      --font-crt: 'VT323', monospace;  /* Authentic pixelated OSD */
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-room);
+      color: var(--ink-white);
+      font-family: var(--font-serif);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      user-select: none;
+    }
+
+    /* --- TOP NAVIGATION --- */
+    header {
+      background: #0d0c0b;
+      border-bottom: 1px solid #24211d;
+      padding: 1.1rem 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      z-index: 40;
+    }
+
+    .brand {
+      color: var(--ink-white);
+      font-weight: 500;
+      letter-spacing: 0.18em;
+    }
+
+    nav ul {
+      display: flex;
+      list-style: none;
+      gap: 2rem;
+    }
+
+    nav a {
+      color: var(--ink-muted);
+      text-decoration: none;
+      transition: color 0.25s ease;
+    }
+
+    nav a:hover,
+    nav a.active {
+      color: var(--ink-white);
+    }
+
+    /* --- BREADCRUMB & METADATA --- */
+    .top-meta {
+      padding: 1.2rem 2.5rem 0.4rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: var(--ink-muted);
+    }
+
+    .top-meta .section-tag {
+      color: var(--amber-led);
+      font-weight: 500;
+    }
+
+    /* --- MAIN SCREENING ROOM --- */
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1rem 2rem 2.5rem;
+    }
+
+    /* --- VINTAGE CRT TV CHASSIS --- */
+    .tv-unit {
+      width: 100%;
+      max-width: 1040px;
+      background: linear-gradient(145deg, #2e2924 0%, #1c1815 100%);
+      border: 3px solid #3d3630;
+      border-radius: 28px;
+      padding: 2.2rem;
+      display: flex;
+      gap: 2.2rem;
+      box-shadow: 
+        0 30px 70px rgba(0, 0, 0, 0.85),
+        inset 0 2px 4px rgba(255, 255, 255, 0.1),
+        inset 0 -4px 8px rgba(0, 0, 0, 0.8);
+      position: relative;
+    }
+
+    /* --- CRT SCREEN HOUSING --- */
+    .crt-monitor {
+      flex: 1;
+      position: relative;
+      background: var(--tv-screen-bg);
+      border-radius: 35px;
+      border: 14px solid var(--tv-bezel);
+      box-shadow: 
+        inset 0 0 40px rgba(0, 0, 0, 0.9),
+        0 4px 15px rgba(0, 0, 0, 0.6);
+      overflow: hidden;
+      aspect-ratio: 4 / 3;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+    }
+
+    /* Curved glass bulge effect */
+    .crt-monitor::before {
+      content: "";
+      position: absolute;
+      inset: 0;
+      border-radius: 20px;
+      background: radial-gradient(circle at 50% 50%, transparent 60%, rgba(0, 0, 0, 0.65) 100%);
+      pointer-events: none;
+      z-index: 15;
+    }
+
+    /* Convex Glass Reflection / Glare */
+    .crt-monitor::after {
+      content: "";
+      position: absolute;
+      top: -30%;
+      left: -20%;
+      width: 140%;
+      height: 70%;
+      background: linear-gradient(175deg, rgba(255, 255, 255, 0.08) 0%, transparent 65%);
+      transform: rotate(-10deg);
+      pointer-events: none;
+      z-index: 16;
+    }
+
+    /* Scanlines Raster Overlay */
+    .scanlines {
+      position: absolute;
+      inset: 0;
+      background: linear-gradient(rgba(18, 16, 16, 0) 50%, rgba(0, 0, 0, 0.38) 50%);
+      background-size: 100% 4px;
+      pointer-events: none;
+      z-index: 12;
+      opacity: 0.85;
+    }
+
+    /* CRT Phosphor Glow / Flicker */
+    .crt-flicker {
+      position: absolute;
+      inset: 0;
+      background: rgba(40, 255, 100, 0.015);
+      pointer-events: none;
+      z-index: 13;
+      animation: crtFlicker 0.15s infinite;
+    }
+
+    @keyframes crtFlicker {
+      0% { opacity: 0.97; }
+      50% { opacity: 1; }
+      100% { opacity: 0.98; }
+    }
+
+    /* Video element inside CRT */
+    .crt-monitor video {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      filter: contrast(1.08) saturate(1.1) brightness(0.98);
+      z-index: 1;
+      transition: opacity 0.25s ease;
+    }
+
+    /* Static noise when switching channels or seeking */
+    .static-noise {
+      position: absolute;
+      inset: 0;
+      background: repeating-radial-gradient(#000 0 0.0001%, #fff 0 0.0002%) 50% 0/2500px 2500px, #111;
+      opacity: 0;
+      pointer-events: none;
+      z-index: 10;
+      transition: opacity 0.12s ease;
+    }
+
+    .static-noise.active {
+      opacity: 0.85;
+    }
+
+    /* --- OSD (ON-SCREEN DISPLAY) --- */
+    .osd-overlay {
+      position: absolute;
+      top: 1.5rem;
+      left: 1.8rem;
+      right: 1.8rem;
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-crt);
+      color: var(--crt-glow);
+      font-size: 1.5rem;
+      letter-spacing: 0.15em;
+      text-shadow: 0 0 8px rgba(60, 255, 120, 0.7);
+      pointer-events: none;
+      z-index: 14;
+    }
+
+    /* --- TV CONTROL PANEL (RIGHT SIDE) --- */
+    .tv-controls {
+      width: 250px;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      background: #191613;
+      border: 2px solid #2e2822;
+      border-radius: 16px;
+      padding: 1.5rem 1.2rem;
+      box-shadow: inset 0 2px 6px rgba(0, 0, 0, 0.6);
+    }
+
+    .panel-brand {
+      text-align: center;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      letter-spacing: 0.25em;
+      color: #6d665b;
+      text-transform: uppercase;
+      border-bottom: 1px solid #2a241e;
+      padding-bottom: 0.8rem;
+    }
+
+    /* Channel buttons grid */
+    .channel-selector {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+      margin: 0.8rem 0;
+    }
+
+    .channel-btn {
+      background: #25201b;
+      border: 1px solid #3b332b;
+      border-radius: 6px;
+      color: #9e9587;
+      padding: 0.6rem 0.8rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.4);
+    }
+
+    .channel-btn:hover {
+      background: #332c25;
+      color: var(--ink-white);
+      border-color: #52473c;
+    }
+
+    .channel-btn.active {
+      background: #3d3329;
+      color: #ffb58a;
+      border-color: var(--amber-led);
+      box-shadow: inset 0 1px 4px rgba(0, 0, 0, 0.6), 0 0 10px rgba(230, 96, 37, 0.25);
+    }
+
+    .channel-btn .ch-tag {
+      font-weight: 600;
+      color: var(--amber-led);
+    }
+
+    /* --- VCR DECK TRANSPORT CONTROLS (-10s / PLAY / PAUSE) --- */
+    .deck-controls {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 0.5rem;
+      padding: 0.8rem 0;
+      border-top: 1px solid #2a241e;
+    }
+
+    .deck-btn {
+      background: #221d18;
+      border: 1px solid #3d342b;
+      border-radius: 5px;
+      color: #a89f90;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.08em;
+      padding: 0.6rem 0.4rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 0.3rem;
+      cursor: pointer;
+      transition: all 0.2s ease;
+      box-shadow: 0 2px 4px rgba(0,0,0,0.3);
+      text-transform: uppercase;
+    }
+
+    .deck-btn:hover {
+      background: #2f2720;
+      color: var(--ink-white);
+      border-color: #5d5043;
+    }
+
+    .deck-btn:active {
+      transform: translateY(1px);
+      box-shadow: inset 0 1px 3px rgba(0,0,0,0.6);
+    }
+
+    .deck-btn.playing {
+      color: #ffaa82;
+      border-color: rgba(230, 96, 37, 0.5);
+    }
+
+    /* Speaker Grill Slits */
+    .speaker-grill {
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      padding: 0.7rem 0;
+      border-top: 1px solid #2a241e;
+      border-bottom: 1px solid #2a241e;
+    }
+
+    .grill-slit {
+      height: 3px;
+      background: #0f0d0b;
+      border-radius: 2px;
+      box-shadow: 0 1px 0 rgba(255, 255, 255, 0.05);
+    }
+
+    /* Bottom Knobs and Power Lamp */
+    .panel-footer {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      padding-top: 0.5rem;
+    }
+
+    .power-unit {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .power-lamp {
+      width: 10px;
+      height: 10px;
+      border-radius: 50%;
+      background: var(--amber-led);
+      box-shadow: 0 0 8px var(--amber-led);
+      transition: opacity 0.3s ease;
+    }
+
+    .power-label {
+      font-family: var(--font-mono);
+      font-size: 0.6rem;
+      letter-spacing: 0.15em;
+      color: #7a7366;
+    }
+
+    .toggle-sound-btn {
+      background: none;
+      border: 1px solid #3b332b;
+      color: #9e9587;
+      padding: 0.4rem 0.6rem;
+      border-radius: 4px;
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      cursor: pointer;
+      transition: color 0.2s, border-color 0.2s;
+    }
+
+    .toggle-sound-btn:hover {
+      color: var(--ink-white);
+      border-color: #7a7366;
+    }
+
+    /* --- CAPTION METADATA BELOW TV --- */
+    .video-info {
+      max-width: 1040px;
+      margin: 1.2rem auto 0;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      border-top: 1px solid #24211d;
+      padding-top: 1.2rem;
+    }
+
+    .video-info .title {
+      font-size: 1.35rem;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+    }
+
+    .video-info .meta {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      color: var(--ink-muted);
+    }
+
+    /* --- RESPONSIVE --- */
+    @media (max-width: 880px) {
+      .tv-unit {
+        flex-direction: column;
+        padding: 1.4rem;
+        gap: 1.5rem;
+      }
+      .tv-controls {
+        width: 100%;
+      }
+      .channel-selector {
+        display: grid;
+        grid-template-columns: repeat(2, 1fr);
+      }
+      .video-info {
+        flex-direction: column;
+        gap: 0.4rem;
+      }
+    }
+    /* --- MENÚ DESPLEGABLE UNIVERSAL --- */
+    .dropdown { position: relative; }
+    .dropdown-content {
+      display: none; position: absolute; top: 100%; left: -15px;
+      background-color: #0a0908; min-width: 140px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+      border: 1px solid #211e19; border-radius: 2px;
+      z-index: 100; overflow: hidden;
+    }
+    .dropdown:hover .dropdown-content { display: block; }
+    .dropdown-content a {
+      color: #8c877c; padding: 12px 18px; text-decoration: none;
+      display: block; font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem;
+      border-bottom: 1px solid #1a1714; transition: background 0.2s, color 0.2s;
+    }
+    .dropdown-content a:last-child { border-bottom: none; }
+    .dropdown-content a:hover {
+      background-color: #161411; color: #f4f0e6;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+<header>
+    <div class="brand">Paloma</div>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li class="dropdown">
+          <a href="VIDEOS.html" class="active">Videos</a>
+          <div class="dropdown-content">
+            <a href="visual.html">Photography</a>
+            <a href="illustration.html">Illustration</a>
+            <a href="drawings.html">Drawings</a>
+            <a href="collages.html">Collages</a>
+            <a href="video.html">Video</a>
+          </div>
+        </li>
+        <li><a href="audio.html">Audio</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="products.html">Products</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- METADATA BAR -->
+  <div class="top-meta">
+    <div>Visual / <span class="section-tag">Video</span></div>
+    <div>CRT Display [4:3 Monitor]</div>
+  </div>
+
+  <!-- SCREENING AREA -->
+  <main>
+    <div style="width: 100%; max-width: 1040px;">
+      
+      <!-- TV SET -->
+      <div class="tv-unit">
+
+        <!-- SCREEN (CLICKABLE TO PLAY/PAUSE) -->
+        <div class="crt-monitor" onclick="togglePlayPause()" title="Click to Pause / Play">
+          <div class="scanlines"></div>
+          <div class="crt-flicker"></div>
+          <div class="static-noise" id="staticNoise"></div>
+
+          <!-- OSD Overlay (Retro Green Phosphor Text) -->
+          <div class="osd-overlay">
+            <span id="osdChannel">CH 01</span>
+            <span id="osdStatus">PLAY ▶ SP</span>
+          </div>
+
+          <!-- Video Player -->
+          <video id="tvPlayer" src="images/video_1.mp4" autoplay loop muted playsinline poster="images/video_1.jpg"></video>
+        </div>
+
+        <!-- CONTROL PANEL -->
+        <aside class="tv-controls">
+          <div class="panel-brand">SOLID STATE / CRT-90</div>
+
+          <!-- CHANNEL SELECTOR -->
+          <div class="channel-selector">
+            <button class="channel-btn active" onclick="switchChannel(0)">
+              <span>Tape 01</span>
+              <span class="ch-tag">01</span>
+            </button>
+          </div>
+
+          <!-- TRANSPORT CONTROLS (-10s & PLAY/PAUSE) -->
+          <div class="deck-controls">
+            <button class="deck-btn" id="rewindBtn" onclick="rewindVideo(10)" title="Rewind 10 seconds">
+              <span>◀◀</span> -10s
+            </button>
+            <button class="deck-btn playing" id="playPauseBtn" onclick="togglePlayPause()" title="Toggle Play / Pause">
+              ❚❚ PAUSE
+            </button>
+          </div>
+
+          <!-- SPEAKER SLITS -->
+          <div class="speaker-grill">
+            <div class="grill-slit"></div>
+            <div class="grill-slit"></div>
+            <div class="grill-slit"></div>
+            <div class="grill-slit"></div>
+            <div class="grill-slit"></div>
+          </div>
+
+          <!-- FOOTER / CONTROLS -->
+          <div class="panel-footer">
+            <div class="power-unit">
+              <div class="power-lamp"></div>
+              <span class="power-label">POWER</span>
+            </div>
+            <button class="toggle-sound-btn" id="soundBtn" onclick="toggleAudio()">SOUND [OFF]</button>
+          </div>
+        </aside>
+
+      </div>
+
+      <!-- METADATA INFO BELOW TV -->
+      <div class="video-info">
+        <div class="title" id="videoTitle">Tape 01</div>
+        <div class="meta" id="videoMeta">VHS Transfer / 2026</div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    // Playlist data
+    const playlist = [
+      {
+        channel: "CH 01",
+        src: "images/video_1.mp4",
+        title: "Tape 01",
+        meta: "VHS Transfer / 2026"
+      }
+    ];
+
+    let currentIdx = 0;
+    let osdTimeout = null;
+
+    const tvPlayer = document.getElementById('tvPlayer');
+    const staticNoise = document.getElementById('staticNoise');
+    const osdChannel = document.getElementById('osdChannel');
+    const osdStatus = document.getElementById('osdStatus');
+    const videoTitle = document.getElementById('videoTitle');
+    const videoMeta = document.getElementById('videoMeta');
+    const channelBtns = document.querySelectorAll('.channel-btn');
+    const soundBtn = document.getElementById('soundBtn');
+    const playPauseBtn = document.getElementById('playPauseBtn');
+
+    /* --- PLAY / PAUSE FUNCTIONALITY --- */
+    function togglePlayPause() {
+      if (tvPlayer.paused) {
+        tvPlayer.play();
+        playPauseBtn.innerHTML = "❚❚ PAUSE";
+        playPauseBtn.classList.add('playing');
+        showOSD("PLAY ▶ SP");
+      } else {
+        tvPlayer.pause();
+        playPauseBtn.innerHTML = "▶ PLAY";
+        playPauseBtn.classList.remove('playing');
+        showOSD("PAUSE ❚❚");
+      }
+    }
+
+    /* --- REWIND 10 SECONDS --- */
+    function rewindVideo(seconds = 10) {
+      tvPlayer.currentTime = Math.max(0, tvPlayer.currentTime - 10);
+      
+      // Vintage static interference flash during tape rewind
+      staticNoise.classList.add('active');
+      showOSD("REW ◀◀ -10S", 900);
+
+      setTimeout(() => {
+        staticNoise.classList.remove('active');
+      }, 160);
+    }
+
+    /* --- TEMPORARY OSD MESSAGE HELPER --- */
+    function showOSD(text, duration = 0) {
+      if (osdTimeout) clearTimeout(osdTimeout);
+      osdStatus.textContent = text;
+
+      if (duration > 0) {
+        osdTimeout = setTimeout(() => {
+          osdStatus.textContent = tvPlayer.paused ? "PAUSE ❚❚" : "PLAY ▶ SP";
+        }, duration);
+      }
+    }
+
+    /* --- CHANNEL SWITCHING --- */
+    function switchChannel(index) {
+      if (index === currentIdx) return;
+      currentIdx = index;
+
+      channelBtns.forEach((btn, idx) => {
+        if (idx === index) btn.classList.add('active');
+        else btn.classList.remove('active');
+      });
+
+      staticNoise.classList.add('active');
+      osdStatus.textContent = "SEARCH...";
+
+      setTimeout(() => {
+        tvPlayer.src = playlist[index].src;
+        tvPlayer.play();
+        osdChannel.textContent = playlist[index].channel;
+        osdStatus.textContent = "PLAY ▶ SP";
+        playPauseBtn.innerHTML = "❚❚ PAUSE";
+        playPauseBtn.classList.add('playing');
+        videoTitle.textContent = playlist[index].title;
+        videoMeta.textContent = playlist[index].meta;
+        staticNoise.classList.remove('active');
+      }, 220);
+    }
+
+    /* --- AUDIO TOGGLE --- */
+    function toggleAudio() {
+      tvPlayer.muted = !tvPlayer.muted;
+      soundBtn.textContent = tvPlayer.muted ? "SOUND [OFF]" : "SOUND [ON]";
+      soundBtn.style.color = tvPlayer.muted ? "#9e9587" : "#ffb58a";
+      showOSD(tvPlayer.muted ? "MUTE" : "VOL ▮▮▮▯", 1200);
+    }
+
+    /* --- KEYBOARD SHORTCUTS --- */
+    document.addEventListener('keydown', (e) => {
+      // Spacebar -> Play / Pause
+      if (e.code === 'Space') {
+        e.preventDefault();
+        togglePlayPause();
+      }
+      // Left Arrow or 'J' -> Rewind 10 seconds
+      if (e.key === 'ArrowLeft' || e.key.toLowerCase() === 'j') {
+        e.preventDefault();
+        rewindVideo(10);
+      }
+      // 'M' -> Mute / Unmute
+      if (e.key.toLowerCase() === 'm') {
+        toggleAudio();
+      }
+    });
+  </script>
+
+</body>
+</html>

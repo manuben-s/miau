@@ -1,0 +1,311 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paloma — Welcome</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,500;1,400;1,500&family=IBM+Plex+Mono:wght@400;500;600&display=swap" rel="stylesheet">
+  
+  <style>
+    :root {
+      --bg-light: #fcfcfb;
+      --ink-dark: #1a1c20;
+      --ink-muted: #6b6b66;
+      
+      --tube-blue: #003688;     
+      --tube-orange: #EE7C0E;   
+      --tube-brown: #b08d57;    
+      
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+    }
+    
+    * { 
+      box-sizing: border-box; 
+      margin: 0; 
+      padding: 0; 
+    }
+    
+    body {
+      background-color: var(--bg-light);
+      color: var(--ink-dark);
+      font-family: var(--font-serif);
+      height: 100vh;
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      -webkit-font-smoothing: antialiased;
+      user-select: none;
+      background-image: linear-gradient(rgba(0, 0, 0, 0.03) 1px, transparent 1px),
+                        linear-gradient(90deg, rgba(0, 0, 0, 0.03) 1px, transparent 1px);
+      background-size: 30px 30px;
+    }
+
+    #subway-map {
+      position: absolute;
+      top: 0; 
+      left: 0; 
+      width: 100%; 
+      height: 100%;
+      z-index: 0;
+      pointer-events: none;
+    }
+
+    .intro-container {
+      position: relative;
+      z-index: 10;
+      background: rgba(255, 255, 255, 0.75);
+      backdrop-filter: blur(16px);
+      -webkit-backdrop-filter: blur(16px);
+      border: 1px solid rgba(0, 0, 0, 0.08);
+      border-radius: 8px;
+      padding: 3.5rem 4rem;
+      max-width: 680px;
+      text-align: center;
+      box-shadow: 0 20px 50px rgba(0, 0, 0, 0.06);
+    }
+
+    .brand-title {
+      font-size: 2.8rem;
+      font-weight: 500;
+      letter-spacing: 0.15em;
+      margin-bottom: 2rem;
+      color: var(--ink-dark);
+      text-transform: uppercase;
+    }
+
+    .welcome-text {
+      font-size: 1.6rem;
+      font-style: italic;
+      line-height: 1.5;
+      color: var(--ink-muted);
+      margin-bottom: 3.5rem;
+      font-weight: 400;
+    }
+
+    .main-nav {
+      display: flex;
+      justify-content: center;
+      gap: 3rem;
+      border-top: 1px solid rgba(0, 0, 0, 0.1);
+      padding-top: 2rem;
+    }
+
+    .main-nav a {
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.18em;
+      color: var(--ink-muted);
+      text-transform: uppercase;
+      text-decoration: none;
+      transition: all 0.3s ease;
+      position: relative;
+      font-weight: 500;
+    }
+
+    .main-nav a:hover {
+      color: var(--ink-dark);
+    }
+
+    .main-nav a::after {
+      content: "";
+      position: absolute;
+      bottom: -6px;
+      left: 50%;
+      transform: translateX(-50%);
+      width: 0;
+      height: 1.5px;
+      background: var(--ink-dark);
+      transition: width 0.3s ease;
+    }
+
+    .main-nav a:hover::after {
+      width: 100%;
+    }
+
+    @media (max-width: 768px) {
+      .intro-container {
+        padding: 2.5rem 2rem;
+        margin: 0 1.5rem;
+      }
+      .brand-title { font-size: 2.2rem; }
+      .welcome-text { font-size: 1.4rem; }
+      .main-nav { flex-wrap: wrap; gap: 1.5rem; }
+    }
+  </style>
+</head>
+<body>
+
+  <canvas id="subway-map"></canvas>
+
+  <div class="intro-container">
+    <h1 class="brand-title">Paloma</h1>
+    <p class="welcome-text">
+      "hi! this is my best effort to gather different parts of my brain into one not extremely messy place. welcome!"
+    </p>
+    <nav class="main-nav">
+      <a href="visual.html">Visual</a>
+      <a href="audio.html">Audio</a>
+      <a href="about.html">About</a>
+      <a href="products.html">Products</a>
+    </nav>
+  </div>
+
+  <script>
+    const canvas = document.getElementById('subway-map');
+    const ctx = canvas.getContext('2d');
+    
+    let width, height;
+    let lines = [];
+
+    function init() {
+      width = canvas.width = window.innerWidth;
+      height = canvas.height = window.innerHeight;
+      
+      const cx = width / 2;
+      const cy = height / 2;
+      
+      const s = Math.max(Math.min(width, height) / 900, 0.4);
+      const S = (val) => val * s;
+
+      const linesConfig = [
+        {
+          color: '#003688', 
+          speed: S(4.5),
+          delay: 0,
+          nodes: [
+            { x: 0, y: cy - S(50) },
+            { x: cx - S(250), y: cy - S(50), name: 'snap', tx: 0, ty: -18 },
+            { x: cx - S(100), y: cy + S(100) }, 
+            { x: cx + S(100), y: cy + S(100), name: 'mesh', tx: 0, ty: 22 }, 
+            { x: cx + S(200), y: cy },
+            { x: cx + S(350), y: cy, name: 'arc', tx: 0, ty: 22 },
+            { x: width, y: cy }
+          ]
+        },
+        {
+          color: '#EE7C0E', 
+          speed: S(3.5),
+          delay: 40,
+          nodes: [
+            { x: cx - S(50), y: height },
+            { x: cx - S(50), y: cy + S(200), name: 'kerb', tx: -35, ty: 4 },
+            { x: cx + S(100), y: cy + S(100) }, 
+            { x: cx + S(100), y: cy - S(50), name: 'flux', tx: 35, ty: 4 },
+            { x: cx + S(250), y: cy - S(200), name: 'grit', tx: 35, ty: 4 },
+            { x: cx + S(250), y: 0 }
+          ]
+        },
+        {
+          color: '#b08d57', 
+          speed: S(4.2),
+          delay: 80,
+          nodes: [
+            { x: width, y: cy - S(200) },
+            { x: cx + S(150), y: cy - S(200) },
+            { x: cx + S(50), y: cy - S(100), name: 'loom', tx: 0, ty: -18 },
+            { x: cx - S(100), y: cy + S(100) }, 
+            { x: cx - S(250), y: cy + S(100), name: 'void', tx: 0, ty: 22 },
+            { x: cx - S(350), y: cy + S(200), name: 'drift', tx: -40, ty: 4 },
+            { x: 0, y: cy + S(200) }
+          ]
+        }
+      ];
+
+      lines = linesConfig.map(config => {
+        let segments = [];
+        let totalDist = 0;
+        
+        for (let i = 0; i < config.nodes.length - 1; i++) {
+          let p1 = config.nodes[i];
+          let p2 = config.nodes[i+1];
+          let dx = p2.x - p1.x;
+          let dy = p2.y - p1.y;
+          let dist = Math.hypot(dx, dy);
+          segments.push({ p1, p2, dist, startDist: totalDist });
+          totalDist += dist;
+        }
+        
+        return {
+          ...config,
+          segments,
+          totalDist,
+          currentDist: -config.delay
+        };
+      });
+    }
+
+    function animate() {
+      ctx.clearRect(0, 0, width, height);
+
+      lines.forEach(line => {
+        if (line.currentDist < line.totalDist + 300) {
+          line.currentDist += line.speed;
+        } else {
+          line.currentDist = -80;
+        }
+
+        if (line.currentDist > 0) {
+          ctx.beginPath();
+          ctx.strokeStyle = line.color;
+          ctx.lineWidth = Math.max(width * 0.008, 8);
+          ctx.lineCap = 'round';
+          ctx.lineJoin = 'round';
+          
+          let reachedStations = [];
+          
+          for (let i = 0; i < line.segments.length; i++) {
+            let seg = line.segments[i];
+            
+            if (i === 0) ctx.moveTo(seg.p1.x, seg.p1.y);
+
+            if (line.currentDist >= seg.startDist + seg.dist) {
+              ctx.lineTo(seg.p2.x, seg.p2.y);
+              if (seg.p2.name) reachedStations.push(seg.p2);
+            } else if (line.currentDist > seg.startDist) {
+              let ratio = (line.currentDist - seg.startDist) / seg.dist;
+              ctx.lineTo(
+                seg.p1.x + (seg.p2.x - seg.p1.x) * ratio,
+                seg.p1.y + (seg.p2.y - seg.p1.y) * ratio
+              );
+              break;
+            }
+          }
+          ctx.stroke();
+
+          const stationRadius = Math.max(width * 0.005, 6);
+          const borderThickness = Math.max(width * 0.0025, 3);
+          
+          reachedStations.forEach(node => {
+            ctx.beginPath();
+            ctx.arc(node.x, node.y, stationRadius, 0, Math.PI * 2);
+            ctx.fillStyle = '#fcfcfb';
+            ctx.fill();
+            ctx.lineWidth = borderThickness;
+            ctx.strokeStyle = line.color;
+            ctx.stroke();
+            
+            ctx.font = '600 13px "IBM Plex Mono"';
+            ctx.fillStyle = '#1a1c20';
+            ctx.textAlign = 'center';
+            ctx.textBaseline = 'middle';
+            ctx.fillText(node.name.toUpperCase(), node.x + node.tx, node.y + node.ty);
+          });
+        }
+      });
+
+      requestAnimationFrame(animate);
+    }
+
+    window.addEventListener('resize', init);
+    init();
+    animate();
+  </script>
+
+</body>
+</html>

@@ -1,0 +1,347 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paloma — Audio</title>
+  
+  <!-- Fonts -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=IBM+Plex+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-studio: #0b0c0e;
+      --panel-bg: #121418;
+      --panel-border: #212630;
+      --gradient-blue-orange: linear-gradient(135deg, #1b3a57 0%, #2b5c8f 35%, #e06028 100%);
+      --accent-blue: #2b5c8f;
+      --accent-orange: #d95a2b;
+      --ink-white: #f5f0e6;
+      --ink-muted: #808896;
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      background-color: var(--bg-studio);
+      color: var(--ink-white);
+      font-family: var(--font-serif);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    /* --- TOP NAVIGATION --- */
+    header {
+      background: #060709;
+      border-bottom: 1px solid #1a1e26;
+      padding: 1.1rem 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      z-index: 50;
+    }
+
+    .brand { color: var(--ink-white); font-weight: 500; letter-spacing: 0.18em; }
+
+    nav ul { display: flex; list-style: none; gap: 2rem; }
+    nav a { color: var(--ink-muted); text-decoration: none; transition: color 0.25s ease; }
+    nav a:hover, nav a.active { color: var(--ink-white); }
+
+    /* --- MAIN WORKSPACE --- */
+    main { flex: 1; display: flex; overflow: hidden; position: relative; }
+
+    .stage-container {
+      flex: 1;
+      display: flex;
+      gap: 2.2rem;
+      padding: 1.8rem 2.5rem;
+      background: radial-gradient(circle at 35% 40%, rgba(43, 92, 143, 0.08) 0%, rgba(217, 90, 43, 0.04) 40%, transparent 75%), #0c0e12;
+      overflow-y: auto; /* Allow scrolling inside the workspace */
+    }
+
+    /* --- LEFT SIDE: TURNTABLE & CUSTOM IMAGE --- */
+    .deck-section {
+      flex: 1.2;
+      display: flex;
+      flex-direction: column;
+      gap: 1.4rem;
+      max-width: 640px;
+    }
+
+    .hardware-turntable {
+      background: #13161c;
+      border: 2px solid var(--panel-border);
+      border-radius: 16px;
+      padding: 1.8rem;
+      display: flex;
+      gap: 2rem;
+      align-items: center;
+      box-shadow: 0 25px 50px rgba(0,0,0,0.75), inset 0 2px 6px rgba(255,255,255,0.04);
+    }
+
+   
+    .platter-area { width: 250px; height: 250px; background: #080a0e; border-radius: 50%; position: relative; box-shadow: inset 0 0 18px rgba(0,0,0,0.95), 0 5px 15px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; }
+    .vinyl-record { width: 242px; height: 242px; background: radial-gradient(circle, #1a1e28 0%, #11141a 38%, #080a0e 70%, #1c222d 100%); border-radius: 50%; transition: transform 0.5s ease; }
+    .vinyl-record.spinning { animation: spinVinyl 3.2s linear infinite; }
+    @keyframes spinVinyl { 100% { transform: rotate(360deg); } }
+    .vinyl-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 88px; height: 88px; background: var(--gradient-blue-orange); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; font-family: var(--font-mono); font-size: 0.52rem; border: 3px solid #0b0c0e; }
+    
+
+    .audio-player-dock { background: linear-gradient(135deg, #13161c 0%, #0d0f14 100%); border: 1px solid var(--panel-border); border-radius: 10px; padding: 1rem; min-height: 115px; }
+    .dock-header { display: flex; justify-content: space-between; align-items: center; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.12em; }
+    .dock-title { color: var(--ink-white); }
+    .dock-brand { background: var(--gradient-blue-orange); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 600; }
+    .soundcloud-iframe-wrap { width: 100%; }
+    .soundcloud-iframe-wrap iframe { width: 100%; height: 80px; border: none; border-radius: 4px; }
+
+    /* Custom Image Zone */
+    .custom-image-zone {
+      width: 100%;
+      flex: 1; /* Esto hace que ocupe todo el espacio libre restante en la columna */
+      min-height: 150px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      margin-top: auto;
+    }
+    
+    .custom-image-zone img {
+      width: 100%;
+      height: 100%;
+      object-fit: contain; /* Para que la imagen encaje sin deformarse, flotando sobre el fondo */
+    }
+
+    /* --- RIGHT SIDE: YOUTUBE FEATURE & UNIFIED CRATE --- */
+    .video-section {
+      flex: 1.3;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .youtube-main-box {
+      background: #13161c;
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      overflow: hidden;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.6);
+    }
+
+    .youtube-player-embed {
+      width: 100%;
+      aspect-ratio: 16 / 9;
+      background: #060709;
+      border: none;
+      display: block;
+    }
+
+    .youtube-info-bar {
+      padding: 1rem 1.2rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      border-top: 1px solid #1c222d;
+    }
+
+    .yt-title { color: var(--ink-white); }
+    .yt-badge { background: var(--gradient-blue-orange); -webkit-background-clip: text; -webkit-text-fill-color: transparent; font-weight: 600; }
+
+    /* Unified Track / Set Crate List */
+    .crate-container {
+      background: #13161c;
+      border: 1px solid var(--panel-border);
+      border-radius: 12px;
+      padding: 1.2rem;
+      display: flex;
+      flex-direction: column;
+      gap: 0.6rem;
+      max-height: 280px;
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+
+    .crate-container::-webkit-scrollbar { display: none; }
+
+    .crate-item {
+      background: #191d26;
+      border: 1px solid #283040;
+      border-radius: 6px;
+      padding: 0.8rem 1rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      cursor: pointer;
+      transition: all 0.2s ease;
+    }
+
+    .crate-item:hover { border-color: var(--accent-blue); background: #1f2533; }
+    .crate-item.active { border-color: var(--accent-orange); background: #252328; box-shadow: 0 0 12px rgba(217, 90, 43, 0.25); }
+
+    .crate-item-info .title { font-family: var(--font-serif); font-size: 1.1rem; color: var(--ink-white); margin-bottom: 0.1rem; }
+    .crate-item-info .meta { font-family: var(--font-mono); font-size: 0.62rem; color: var(--ink-muted); letter-spacing: 0.08em; }
+
+    .crate-badge { font-family: var(--font-mono); font-size: 0.6rem; letter-spacing: 0.1em; padding: 3px 8px; border-radius: 3px; text-transform: uppercase; }
+    .crate-badge.sc { background: rgba(43, 92, 143, 0.25); color: #73a9e6; border: 1px solid rgba(43, 92, 143, 0.4); }
+    .crate-badge.yt { background: rgba(217, 90, 43, 0.25); color: #ffaa82; border: 1px solid rgba(217, 90, 43, 0.4); }
+
+    /* --- RESPONSIVE --- */
+    @media (max-width: 1024px) {
+      body { height: auto; overflow-y: auto; }
+      main { flex-direction: column; }
+      .stage-container { flex-direction: column; padding: 1.5rem; }
+    }
+    /* --- MENÚ DESPLEGABLE UNIVERSAL --- */
+    .dropdown { position: relative; }
+    .dropdown-content {
+      display: none; position: absolute; top: 100%; left: -15px;
+      background-color: #0a0908; min-width: 140px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+      border: 1px solid #211e19; border-radius: 2px;
+      z-index: 100; overflow: hidden;
+    }
+    .dropdown:hover .dropdown-content { display: block; }
+    .dropdown-content a {
+      color: #8c877c; padding: 12px 18px; text-decoration: none;
+      display: block; font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem;
+      border-bottom: 1px solid #1a1714; transition: background 0.2s, color 0.2s;
+    }
+    .dropdown-content a:last-child { border-bottom: none; }
+    .dropdown-content a:hover {
+      background-color: #161411; color: #f4f0e6;
+    }
+  </style>
+</head>
+<body>
+
+  <!-- HEADER -->
+<header>
+    <div class="brand">Paloma</div>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li class="dropdown">
+          <a href="audio.html" class="active">Audio</a>
+          <div class="dropdown-content">
+            <a href="visual.html">Photography</a>
+            <a href="illustration.html">Illustration</a>
+            <a href="drawings.html">Drawings</a>
+            <a href="collages.html">Collages</a>
+            <a href="video.html">Video</a>
+          </div>
+        </li>
+        <li><a href="audio.html">Audio</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="products.html">Products</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- MAIN WORKSPACE -->
+  <main>
+    <div class="stage-container">
+      
+      <!-- LEFT: TURNTABLE, PLAYER DOCK & CUSTOM IMAGE -->
+      <div class="deck-section">
+        
+        <div class="hardware-turntable">
+          <div class="platter-area">
+            <div class="vinyl-record spinning" id="vinylRecord">
+              <div class="vinyl-label"><span>miau!</span></div>
+            </div>
+          </div>
+       
+        </div>
+
+        <div class="audio-player-dock">
+          <div class="dock-header"><span class="dock-title" id="dockTrackTitle">miau!</span><span class="dock-brand">SOUNDCLOUD AUDIO</span></div>
+          <div class="soundcloud-iframe-wrap" id="scEmbedContainer">
+            <iframe src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/ix_suona/backtocompass?si=2ab1b55c403a4c7bb3e5c2cb42c6e901&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing"></iframe>
+          </div>
+        </div>
+
+        <!-- NEW: Floating Image Zone -->
+        <div class="custom-image-zone">
+            <img src="images/audio_fondo.png" alt="Custom Graphic">
+        </div>
+
+      </div> <!-- Cierre correcto del div deck-section -->
+
+      <!-- RIGHT: YOUTUBE FEATURE & UNIFIED CRATE -->
+      <div class="video-section">
+        <div class="youtube-main-box">
+          <iframe class="youtube-player-embed" id="mainVideoEmbed" src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="DJ Set Live" frameborder="0" allowfullscreen></iframe>
+          <div class="youtube-info-bar"><span class="yt-title" id="ytMainTitle"> miau! b2b _xandrio @TheCampOutFestival 2026 </span><span class="yt-badge">YOUTUBE STREAM</span></div>
+        </div>
+
+        <!-- Unified Track / Set Crate List -->
+        <div class="crate-container" id="crateContainer">
+          <!-- Items will be populated by JS -->
+        </div>
+      </div>
+
+    </div>
+  </main>
+
+  <script>
+    const playlist = [
+      { id: "tr-1", type: "soundcloud", title: "Back To Compass", meta: "2025", sourceId: "https://soundcloud.com/ix_suona/backtocompass?si=2ab1b55c403a4c7bb3e5c2cb42c6e901&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing", thumb: "images/illustration_1_4.png" },
+      { id: "tr-2", type: "soundcloud", title: "Ratatouille's Fireworks", meta: "2025", sourceId: "https://soundcloud.com/ix_suona/ratatouilles-fireworks?si=0386514e89334472acdbc65d0f4b95ea&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing", thumb: "images/illustration_1_2.png" },
+      { id: "tr-3", type: "youtube", title: "@TheCampOutFestival", meta: "_xandrio b2b miau! — 2026", sourceId: "dQw4w9WgXcQ", thumb: "images/illustration_1_4.jpg" },
+    ];
+
+    let currentIdx = 0;
+    const crateContainer = document.getElementById('crateContainer');
+    const vinylRecord = document.getElementById('vinylRecord');
+    const dockTrackTitle = document.getElementById('dockTrackTitle');
+    const scEmbedContainer = document.getElementById('scEmbedContainer');
+    const mainVideoEmbed = document.getElementById('mainVideoEmbed');
+    const ytMainTitle = document.getElementById('ytMainTitle');
+
+    function renderCrate() {
+      crateContainer.innerHTML = '';
+      playlist.forEach((item, idx) => {
+        const div = document.createElement('div');
+        div.className = `crate-item ${idx === currentIdx ? 'active' : ''}`;
+        div.onclick = () => selectPlayItem(idx);
+        const badgeClass = item.type === 'soundcloud' ? 'sc' : 'yt';
+        const badgeText = item.type === 'soundcloud' ? 'SoundCloud' : 'YouTube';
+        div.innerHTML = `<div class="crate-item-info"><div class="title">${item.title}</div><div class="meta">${item.meta}</div></div><div class="crate-badge ${badgeClass}">${badgeText}</div>`;
+        crateContainer.appendChild(div);
+      });
+    }
+
+    function selectPlayItem(index) {
+      currentIdx = index;
+      const item = playlist[index];
+      renderCrate();
+      if (item.type === 'soundcloud') {
+        vinylRecord.classList.add('spinning');
+        dockTrackTitle.textContent = `PALOMA — ${item.title}`;
+        scEmbedContainer.innerHTML = `<iframe src="https://w.soundcloud.com/player/?url=${item.sourceId}&color=%232b5c8f&auto_play=true&hide_related=true&show_comments=false&show_user=true&show_reposts=false&show_teaser=false"></iframe>`;
+      } else {
+        vinylRecord.classList.remove('spinning');
+        mainVideoEmbed.src = `https://www.youtube.com/embed/${item.sourceId}?autoplay=1`;
+        ytMainTitle.textContent = `PALOMA | ${item.title}`;
+      }
+    }
+
+    renderCrate();
+  </script>
+</body>
+</html>

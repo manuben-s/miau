@@ -1,0 +1,716 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Paloma — Drawings</title>
+  
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=IBM+Plex+Mono:wght@300;400;500&display=swap" rel="stylesheet">
+
+  <style>
+    :root {
+      --bg-desk: #161513;
+      --paper-base: #f4f0e6;
+      --paper-texture: rgba(180, 160, 130, 0.08);
+      --ink: #1c1b18;
+      --ink-muted: #736f66;
+      --line: #ded8cb;
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-desk);
+      color: var(--ink);
+      font-family: var(--font-serif);
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+      overflow-x: hidden;
+      user-select: none;
+    }
+
+    /* --- TOP NAVIGATION --- */
+    header {
+      background: #0d0d0c;
+      border-bottom: 1px solid #24221f;
+      padding: 1.1rem 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      z-index: 30;
+    }
+
+    .brand {
+      color: #f4f0e6;
+      font-weight: 500;
+      letter-spacing: 0.18em;
+    }
+
+    nav ul {
+      display: flex;
+      list-style: none;
+      gap: 2rem;
+    }
+
+    nav a {
+      color: #8c877c;
+      text-decoration: none;
+      transition: color 0.25s ease;
+    }
+
+    nav a:hover,
+    nav a.active {
+      color: #f4f0e6;
+    }
+
+    /* --- BREADCRUMB & METADATA --- */
+    .top-meta {
+      padding: 1.2rem 2rem 0.4rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      max-width: 1360px;
+      margin: 0 auto;
+      width: 100%;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.18em;
+      text-transform: uppercase;
+      color: #8c877c;
+    }
+
+    /* --- MAIN SKETCHBOOK WRAPPER --- */
+    main {
+      flex: 1;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 0.5rem 2rem 2.5rem;
+    }
+
+    .sketchbook-wrapper {
+      position: relative;
+      width: 100%;
+      max-width: 1360px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    /* OPAQUE SIDE BUTTONS */
+    .side-arrow {
+      position: absolute;
+      top: 50%;
+      transform: translateY(-50%);
+      background: #282622;
+      border: 1.5px solid #4a463f;
+      color: #f4f0e6;
+      width: 52px;
+      height: 52px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      cursor: pointer;
+      z-index: 25;
+      transition: background-color 0.25s ease, border-color 0.25s ease, color 0.25s ease, transform 0.25s ease, box-shadow 0.25s ease;
+      box-shadow: 0 6px 18px rgba(0, 0, 0, 0.45);
+      font-size: 1.5rem;
+      font-family: var(--font-mono);
+      line-height: 1;
+    }
+
+    .side-arrow:hover:not(:disabled) {
+      background: #f4f0e6;
+      color: #161513;
+      border-color: #f4f0e6;
+      transform: translateY(-50%) scale(1.08);
+      box-shadow: 0 8px 24px rgba(0, 0, 0, 0.6);
+    }
+
+    .side-arrow:disabled {
+      opacity: 0.2;
+      background: #1c1b18;
+      border-color: #2b2926;
+      color: #55514a;
+      cursor: not-allowed;
+      box-shadow: none;
+      transform: translateY(-50%) scale(1);
+    }
+
+    .side-arrow.prev { left: -26px; }
+    .side-arrow.next { right: -26px; }
+
+    /* --- SKETCHBOOK CONTAINER --- */
+    .sketchbook {
+      width: 100%;
+      min-height: 72vh;
+      background-color: var(--paper-base);
+      border-radius: 4px;
+      position: relative;
+      box-shadow: 
+        0 30px 60px -15px rgba(0, 0, 0, 0.65),
+        0 0 0 1px rgba(0, 0, 0, 0.25),
+        inset 0 0 80px rgba(180, 160, 130, 0.18);
+      background-image: 
+        radial-gradient(var(--paper-texture) 1px, transparent 1px),
+        linear-gradient(to right, rgba(0,0,0,0.02) 1px, transparent 1px);
+      background-size: 16px 16px, 100% 100%;
+      perspective: 2400px;
+      display: flex;
+    }
+
+    /* Center crease and stitched thread */
+    .sketchbook::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      left: 50%;
+      width: 46px;
+      transform: translateX(-50%);
+      background: linear-gradient(
+        to right,
+        rgba(0,0,0,0.1) 0%,
+        rgba(0,0,0,0.02) 40%,
+        rgba(0,0,0,0.15) 50%,
+        rgba(0,0,0,0.02) 60%,
+        rgba(0,0,0,0.1) 100%
+      );
+      pointer-events: none;
+      z-index: 15;
+    }
+
+    .sketchbook::after {
+      content: "";
+      position: absolute;
+      top: 25px;
+      bottom: 25px;
+      left: 50%;
+      width: 1px;
+      border-left: 1.5px dashed rgba(90, 80, 65, 0.35);
+      transform: translateX(-50%);
+      pointer-events: none;
+      z-index: 16;
+    }
+
+    /* --- SPREADS & PAGES --- */
+    .spread {
+      position: absolute;
+      inset: 0;
+      display: flex;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.4s ease;
+      z-index: 1;
+    }
+
+    .spread.active {
+      opacity: 1;
+      pointer-events: auto;
+      z-index: 2;
+    }
+
+    .page {
+      flex: 1;
+      padding: 3.5rem 3rem 2.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
+      position: relative;
+    }
+
+    .artwork-stage {
+      flex: 1;
+      width: 100%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      min-height: 380px;
+    }
+
+    /* SIN MARCO BLANCO ARTIFICIAL — INTEGRACIÓN DIRECTA CON ZOOM */
+    .artwork-frame {
+      display: inline-block;
+      max-width: 90%;
+      max-height: 56vh;
+      background: transparent;
+      padding: 0;
+      border: none;
+      cursor: zoom-in;
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1), filter 0.35s ease;
+      filter: drop-shadow(0 10px 22px rgba(0, 0, 0, 0.12));
+    }
+
+    .artwork-frame:hover {
+      transform: scale(1.02);
+      filter: drop-shadow(0 16px 30px rgba(0, 0, 0, 0.2));
+    }
+
+    .artwork-frame img {
+      display: block;
+      width: auto;
+      height: auto;
+      max-width: 100%;
+      max-height: 54vh;
+      object-fit: contain;
+    }
+
+    /* --- CAPTIONS --- */
+    .caption {
+      text-align: center;
+      margin-top: 1.6rem;
+    }
+
+    .caption .title {
+      font-size: 1.15rem;
+      font-weight: 400;
+      letter-spacing: 0.04em;
+      color: var(--ink);
+      margin-bottom: 0.2rem;
+    }
+
+    .caption .meta {
+      font-size: 0.95rem;
+      font-style: italic;
+      color: var(--ink-muted);
+      line-height: 1.4;
+    }
+
+    .caption .year {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      letter-spacing: 0.1em;
+      color: #9e978a;
+      margin-top: 0.35rem;
+    }
+
+    /* --- 3D FLIP EFFECT --- */
+    .flip-leaf {
+      position: absolute;
+      top: 0;
+      bottom: 0;
+      width: 50%;
+      transform-style: preserve-3d;
+      z-index: 10;
+      pointer-events: none;
+      display: none;
+    }
+
+    .flip-leaf.flipping-next {
+      right: 0;
+      transform-origin: left center;
+      display: block;
+      animation: flipNext 0.75s cubic-bezier(0.645, 0.045, 0.355, 1) forwards;
+    }
+
+    .flip-leaf.flipping-prev {
+      left: 0;
+      transform-origin: right center;
+      display: block;
+      animation: flipPrev 0.75s cubic-bezier(0.645, 0.045, 0.355, 1) forwards;
+    }
+
+    .leaf-face {
+      position: absolute;
+      inset: 0;
+      backface-visibility: hidden;
+      background-color: var(--paper-base);
+      background-image: 
+        radial-gradient(var(--paper-texture) 1px, transparent 1px),
+        linear-gradient(to right, rgba(0,0,0,0.02) 1px, transparent 1px);
+      background-size: 16px 16px, 100% 100%;
+      overflow: hidden;
+    }
+
+    .leaf-face.back {
+      transform: rotateY(180deg);
+    }
+
+    @keyframes flipNext {
+      0% { transform: rotateY(0deg); box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+      50% { box-shadow: -20px 0 35px rgba(0,0,0,0.3); }
+      100% { transform: rotateY(-180deg); box-shadow: 0 0 10px rgba(0,0,0,0.05); }
+    }
+
+    @keyframes flipPrev {
+      0% { transform: rotateY(0deg); box-shadow: 0 0 10px rgba(0,0,0,0.1); }
+      50% { box-shadow: 20px 0 35px rgba(0,0,0,0.3); }
+      100% { transform: rotateY(180deg); box-shadow: 0 0 10px rgba(0,0,0,0.05); }
+    }
+
+    /* --- LIGHTBOX (VISOR AMPLIADO) --- */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(13, 12, 11, 0.94);
+      backdrop-filter: blur(12px);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+      padding: 2rem;
+      cursor: zoom-out;
+    }
+
+    .lightbox.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .lightbox-content {
+      position: relative;
+      max-width: 90vw;
+      max-height: 84vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: default;
+    }
+
+    .lightbox-content img {
+      max-width: 88vw;
+      max-height: 78vh;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      box-shadow: 0 25px 60px rgba(0,0,0,0.85);
+      border-radius: 2px;
+      transform: scale(0.96);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .lightbox.active .lightbox-content img {
+      transform: scale(1);
+    }
+
+    .lightbox-caption {
+      margin-top: 1.2rem;
+      color: #f4f0e6;
+      font-family: var(--font-serif);
+      font-size: 1.15rem;
+      text-align: center;
+      letter-spacing: 0.03em;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 2rem;
+      right: 2.5rem;
+      background: none;
+      border: none;
+      color: #8c877c;
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.15em;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: color 0.2s ease;
+    }
+
+    .lightbox-close:hover {
+      color: #f4f0e6;
+    }
+
+    /* --- RESPONSIVE --- */
+    @media (max-width: 900px) {
+      .side-arrow {
+        position: fixed;
+        bottom: 1.5rem;
+        top: auto;
+        transform: none;
+      }
+      .side-arrow.prev { left: 1.5rem; }
+      .side-arrow.next { right: 1.5rem; }
+      .side-arrow:hover:not(:disabled) {
+        transform: scale(1.05);
+      }
+      .sketchbook {
+        flex-direction: column;
+        min-height: auto;
+      }
+      .sketchbook::before,
+      .sketchbook::after {
+        display: none;
+      }
+      .spread {
+        position: relative;
+        flex-direction: column;
+      }
+      .page {
+        padding: 2.5rem 1.5rem;
+        border-bottom: 1px solid var(--line);
+      }
+      .page:last-child {
+        border-bottom: none;
+      }
+      .lightbox-close {
+        top: 1rem;
+        right: 1.5rem;
+      }
+    }
+    /* --- MENÚ DESPLEGABLE UNIVERSAL --- */
+    .dropdown { position: relative; }
+    .dropdown-content {
+      display: none; position: absolute; top: 100%; left: -15px;
+      background-color: #0a0908; min-width: 140px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+      border: 1px solid #211e19; border-radius: 2px;
+      z-index: 100; overflow: hidden;
+    }
+    .dropdown:hover .dropdown-content { display: block; }
+    .dropdown-content a {
+      color: #8c877c; padding: 12px 18px; text-decoration: none;
+      display: block; font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem;
+      border-bottom: 1px solid #1a1714; transition: background 0.2s, color 0.2s;
+    }
+    .dropdown-content a:last-child { border-bottom: none; }
+    .dropdown-content a:hover {
+      background-color: #161411; color: #f4f0e6;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+    <div class="brand">Paloma</div>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li class="dropdown">
+          <a href="visual.html" class="active">Visual</a>
+          <div class="dropdown-content">
+            <a href="visual.html">Photography</a>
+            <a href="illustration.html">Illustration</a>
+            <a href="drawings.html">Drawings</a>
+            <a href="collages.html">Collages</a>
+            <a href="video.html">Video</a>
+          </div>
+        </li>
+        <li><a href="audio.html">Audio</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="products.html">Products</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <!-- TOP METADATA -->
+  <div class="top-meta">
+    <div>Visual / Drawings</div>
+    <div id="pageIndicator">Plates 01 – 02</div>
+  </div>
+
+  <!-- MAIN VIEWPORT -->
+  <main>
+    <div class="sketchbook-wrapper">
+
+      <!-- PREVIOUS BUTTON -->
+      <button class="side-arrow prev" id="prevBtn" onclick="turnPage(-1)" aria-label="Previous page" disabled>
+        ←
+      </button>
+
+      <!-- SKETCHBOOK -->
+      <div class="sketchbook" id="sketchbook">
+
+        <!-- SPREAD 1 (DRAWINGS 1 & 2) -->
+        <div class="spread active" data-index="0">
+          <section class="page page-left">
+            <div class="artwork-stage">
+              <div class="artwork-frame" onclick="openLightbox('images/drawing_1.png', 'Balkan Rainbow Gathering (2026)')">
+                <img src="images/drawing_1.png" alt="Balkan Rainbow Gathering">
+              </div>
+            </div>
+            <div class="caption">
+              <div class="title">Balkan Rainbow Gathering</div>
+              <div class="meta"></div>
+              <div class="year">2026</div>
+            </div>
+          </section>
+
+          <section class="page page-right">
+            <div class="artwork-stage">
+              <div class="artwork-frame" onclick="openLightbox('images/drawing_2.jpg', '02 (2026)')">
+                <img src="images/drawing_2.jpg" alt="Plate 02">
+              </div>
+            </div>
+            <div class="caption">
+              <div class="title">02</div>
+              <div class="meta"></div>
+              <div class="year">2026</div>
+            </div>
+          </section>
+        </div>
+
+        <!-- SPREAD 2 (DRAWINGS 3 & 4) -->
+        <div class="spread" data-index="1">
+          <section class="page page-left">
+            <div class="artwork-stage">
+              <div class="artwork-frame" onclick="openLightbox('images/drawing_3.jpg', '03 (2026)')">
+                <img src="images/drawing_3.jpg" alt="Plate 03">
+              </div>
+            </div>
+            <div class="caption">
+              <div class="title">03</div>
+              <div class="meta"></div>
+              <div class="year">2026</div>
+            </div>
+          </section>
+
+          <section class="page page-right">
+            <div class="artwork-stage">
+              <div class="artwork-frame" onclick="openLightbox('images/drawing_4.jpg', '04')">
+                <img src="images/drawing_4.jpg" alt="Plate 04">
+              </div>
+            </div>
+            <div class="caption">
+              <div class="title">04</div>
+              <div class="meta"></div>
+              <div class="year"></div>
+            </div>
+          </section>
+        </div>
+
+        <!-- 3D FLIP LEAF -->
+        <div class="flip-leaf" id="flipLeaf">
+          <div class="leaf-face front" id="leafFront"></div>
+          <div class="leaf-face back" id="leafBack"></div>
+        </div>
+
+      </div>
+
+      <!-- NEXT BUTTON -->
+      <button class="side-arrow next" id="nextBtn" onclick="turnPage(1)" aria-label="Next page">
+        →
+      </button>
+
+    </div>
+  </main>
+
+  <!-- LIGHTBOX MODAL -->
+  <div class="lightbox" id="lightbox" onclick="closeLightbox(event)">
+    <button class="lightbox-close" onclick="closeLightboxDirect()">[ Close / ESC ]</button>
+    <div class="lightbox-content">
+      <img id="lightboxImg" src="" alt="Enlarged Artwork">
+      <div class="lightbox-caption" id="lightboxCaption"></div>
+    </div>
+  </div>
+
+  <script>
+    let currentSpread = 0;
+    let isAnimating = false;
+
+    const spreads = document.querySelectorAll('.spread');
+    const totalSpreads = spreads.length;
+    const prevBtn = document.getElementById('prevBtn');
+    const nextBtn = document.getElementById('nextBtn');
+    const pageIndicator = document.getElementById('pageIndicator');
+    const flipLeaf = document.getElementById('flipLeaf');
+    const leafFront = document.getElementById('leafFront');
+    const leafBack = document.getElementById('leafBack');
+
+    const lightbox = document.getElementById('lightbox');
+    const lightboxImg = document.getElementById('lightboxImg');
+    const lightboxCaption = document.getElementById('lightboxCaption');
+
+    function updateButtons() {
+      prevBtn.disabled = currentSpread === 0;
+      nextBtn.disabled = currentSpread === totalSpreads - 1;
+
+      const firstNum = String(currentSpread * 2 + 1).padStart(2, '0');
+      const secondNum = String(Math.min((currentSpread + 1) * 2, totalSpreads * 2)).padStart(2, '0');
+      pageIndicator.textContent = `Plates ${firstNum} – ${secondNum}`;
+    }
+
+    function turnPage(direction) {
+      if (isAnimating) return;
+      const targetSpread = currentSpread + direction;
+      if (targetSpread < 0 || targetSpread >= totalSpreads) return;
+
+      isAnimating = true;
+
+      const currentSpreadEl = spreads[currentSpread];
+      const nextSpreadEl = spreads[targetSpread];
+
+      if (direction === 1) {
+        leafFront.innerHTML = currentSpreadEl.querySelector('.page-right').innerHTML;
+        leafBack.innerHTML = nextSpreadEl.querySelector('.page-left').innerHTML;
+
+        flipLeaf.className = 'flip-leaf flipping-next';
+
+        setTimeout(() => {
+          currentSpreadEl.classList.remove('active');
+          nextSpreadEl.classList.add('active');
+          currentSpread = targetSpread;
+          flipLeaf.className = 'flip-leaf';
+          updateButtons();
+          isAnimating = false;
+        }, 750);
+
+      } else {
+        leafFront.innerHTML = currentSpreadEl.querySelector('.page-left').innerHTML;
+        leafBack.innerHTML = nextSpreadEl.querySelector('.page-right').innerHTML;
+
+        flipLeaf.className = 'flip-leaf flipping-prev';
+
+        setTimeout(() => {
+          currentSpreadEl.classList.remove('active');
+          nextSpreadEl.classList.add('active');
+          currentSpread = targetSpread;
+          flipLeaf.className = 'flip-leaf';
+          updateButtons();
+          isAnimating = false;
+        }, 750);
+      }
+    }
+
+    /* --- LIGHTBOX FUNCTIONS --- */
+    function openLightbox(src, captionText) {
+      lightboxImg.src = src;
+      lightboxCaption.textContent = captionText;
+      lightbox.classList.add('active');
+    }
+
+    function closeLightbox(e) {
+      if (e.target === lightbox) {
+        lightbox.classList.remove('active');
+      }
+    }
+
+    function closeLightboxDirect() {
+      lightbox.classList.remove('active');
+    }
+
+    /* --- KEYBOARD CONTROLS --- */
+    document.addEventListener('keydown', (e) => {
+      if (lightbox.classList.contains('active')) {
+        if (e.key === 'Escape') closeLightboxDirect();
+        return;
+      }
+      if (e.key === 'ArrowRight') turnPage(1);
+      if (e.key === 'ArrowLeft') turnPage(-1);
+    });
+
+    updateButtons();
+  </script>
+
+</body>
+</html>

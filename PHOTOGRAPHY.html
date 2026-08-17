@@ -1,0 +1,1075 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Visual - Paloma Photography (Todo en Uno y Filtrable)</title>
+  
+  <!-- 1. TIPOGRAFÍAS (Google Fonts) -->
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=IBM+Plex+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
+  
+  <!-- 2. LIBRERÍAS (Masonry.js + ImagesLoaded para alturas variables) -->
+  <script src="https://unpkg.com/masonry-layout@4/dist/masonry.pkgd.min.js"></script>
+  <script src="https://unpkg.com/imagesloaded@5/imagesloaded.pkgd.min.js"></script>
+
+  <!-- 3. ESTILOS CSS -->
+  <style>
+    /* VARIABLES Y ESTILOS GLOBALES BASE */
+    :root {
+      --bg-dark: #0b0c0e;
+      --gunmetal-panel: #121418;
+      --silver-text: #f5f0e6;
+      --ink-muted: #808896;
+      --bevel-light: rgba(255, 255, 255, 0.08);
+      --bevel-dark: rgba(0, 0, 0, 0.5);
+      --bevel-shadow: rgba(0, 0, 0, 0.8);
+      --rust-accent: #d95a2b;
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+    }
+
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
+
+    body {
+      background-color: var(--bg-dark);
+      color: var(--silver-text);
+      font-family: var(--font-serif);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+      user-select: none;
+    }
+
+    .textured-bg {
+      position: relative;
+    }
+
+    .textured-bg::before {
+      content: "";
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: radial-gradient(circle at center, rgba(43, 92, 143, 0.1) 0%, transparent 70%);
+      pointer-events: none;
+    }
+
+    header {
+      background: #060709;
+      border-bottom: 1px solid #1a1e26;
+      padding: 1.1rem 2.5rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      z-index: 50;
+    }
+
+    header h1 {
+      color: var(--silver-text);
+      font-weight: 500;
+      letter-spacing: 0.18em;
+    }
+
+    nav ul {
+      display: flex;
+      list-style: none;
+      gap: 2rem;
+    }
+
+    nav a {
+      color: var(--ink-muted);
+      text-decoration: none;
+      transition: color 0.25s ease;
+      position: relative;
+    }
+
+    nav a:hover,
+    nav a.active {
+      color: var(--silver-text);
+    }
+
+    nav a.active::after {
+      content: "";
+      position: absolute;
+      bottom: -4px;
+      left: 0;
+      width: 100%;
+      height: 2px;
+      background: linear-gradient(180deg, var(--ink-muted), var(--bg-dark));
+      box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+    }
+
+    .visual-stage-container {
+      flex: 1;
+      display: flex;
+      gap: 2.2rem;
+      padding: 1.8rem 2.5rem;
+      overflow-y: auto;
+    }
+
+    /* --- BARRA LATERAL IZQUIERDA --- */
+    #sidebar {
+      flex: 0 0 250px;
+      display: flex;
+      flex-direction: column;
+      gap: 1.4rem;
+    }
+
+    .bevel-border {
+      background-color: var(--gunmetal-panel);
+      border: 1px solid rgba(0, 0, 0, 0.4);
+      border-radius: 8px;
+      box-shadow: 
+        inset 0 1px 0 var(--bevel-light),
+        inset 1px 0 0 var(--bevel-light),
+        0 1px 2px var(--bevel-shadow),
+        0 5px 15px rgba(0, 0, 0, 0.3);
+    }
+
+    .collections-panel,
+    .analogue-panel {
+      padding: 1.2rem;
+      position: relative;
+    }
+
+    .panel-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.8rem;
+      font-family: var(--font-serif);
+    }
+
+    .panel-header .title {
+      color: var(--silver-text);
+      font-size: 1.1rem;
+    }
+
+    .panel-header .count {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--ink-muted);
+    }
+
+    ul.collection-list,
+    ul.analogue-list {
+      list-style: none;
+      font-family: var(--font-serif);
+      font-size: 1rem;
+      line-height: 1.6;
+    }
+
+    ul.collection-list li,
+    ul.analogue-list li {
+      color: var(--silver-text);
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 0.2rem;
+      cursor: pointer;
+      transition: color 0.2s;
+    }
+
+    ul.collection-list li.active,
+    ul.analogue-list li.active,
+    ul.collection-list li:hover,
+    ul.analogue-list li:hover {
+      color: var(--rust-accent);
+    }
+
+    .sub-count {
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--ink-muted);
+    }
+
+    /* --- GALERÍA PRINCIPAL --- */
+    .main-gallery {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      gap: 1.2rem;
+    }
+
+    .gallery-sub-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--ink-muted);
+      letter-spacing: 0.1em;
+    }
+
+    .gallery-sub-header .mono {
+      font-weight: 600;
+      color: var(--silver-text);
+    }
+
+    /* Modificado: Contenedor Masonry al 100% */
+    .masonry-gallery-container {
+      display: block;
+      width: 100%;
+    }
+
+    /* Modificado: Asegurar que los items filtrados no afecten al layout */
+    .grid-item {
+      width: calc(20% - 10px);
+      margin-bottom: 10px;
+      border-radius: 6px;
+      overflow: hidden;
+      position: absolute; /* Masonry requiere posicionamiento absoluto internamente, pero es mejor definirlo explícitamente a veces */
+      border: 1px solid rgba(0, 0, 0, 0.4);
+      box-shadow: 
+        inset 0 1px 0 var(--bevel-light),
+        0 1px 2px var(--bevel-shadow);
+      cursor: zoom-in;
+      transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s, visibility 0.2s;
+    }
+
+    /* Ocultar elementos de forma robusta para Masonry */
+    .grid-item.hidden {
+      display: none !important;
+      opacity: 0;
+      visibility: hidden;
+      position: absolute; /* Evita que ocupen espacio en el flujo normal si fallara el display: none */
+    }
+
+    .grid-item:hover {
+      transform: translateY(-2px);
+      box-shadow: 
+        0 4px 8px rgba(0, 0, 0, 0.5),
+        0 0 12px rgba(217, 90, 43, 0.15);
+    }
+
+    .grid-item img, .grid-item video {
+      width: 100%;
+      height: auto;
+      display: block;
+    }
+
+    /* Elemento para fijar el ancho de columna (Sizer) - CLAVE PARA MASONRY */
+    .grid-sizer {
+      width: calc(20% - 10px);
+    }
+
+    /* MODAL */
+    .modal {
+      display: none;
+      position: fixed;
+      z-index: 100;
+      left: 0;
+      top: 0;
+      width: 100%;
+      height: 100%;
+      background-color: rgba(6, 7, 9, 0.9);
+      align-items: center;
+      justify-content: center;
+      overflow: hidden;
+      pointer-events: none;
+    }
+
+    .modal.show {
+      display: flex;
+      pointer-events: auto;
+    }
+
+    .modal-content {
+      max-width: 90%;
+      max-height: 90%;
+      object-fit: contain;
+      border-radius: 8px;
+      box-shadow: 0 0 30px rgba(0, 0, 0, 0.8);
+      transform: scale(0.9);
+      transition: transform 0.3s ease;
+      cursor: zoom-out;
+    }
+
+    .modal.show .modal-content {
+      transform: scale(1);
+    }
+
+    .close-modal {
+      position: absolute;
+      top: 2rem;
+      right: 2rem;
+      color: var(--silver-text);
+      font-size: 2rem;
+      font-weight: 300;
+      cursor: pointer;
+      transition: color 0.2s;
+      z-index: 101;
+    }
+
+    .close-modal:hover {
+      color: var(--rust-accent);
+    }
+
+    @media (max-width: 1024px) {
+      body {
+        height: auto;
+        overflow-y: auto;
+      }
+      .visual-stage-container {
+        flex-direction: column;
+        padding: 1.5rem;
+      }
+      #sidebar {
+        flex: none;
+        width: 100%;
+      }
+      .grid-item, .grid-sizer {
+        width: calc(33.33% - 10px);
+      }
+    }
+    /* --- MENÚ DESPLEGABLE UNIVERSAL --- */
+    .dropdown { position: relative; }
+    .dropdown-content {
+      display: none; position: absolute; top: 100%; left: -15px;
+      background-color: #0a0908; min-width: 140px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+      border: 1px solid #211e19; border-radius: 2px;
+      z-index: 100; overflow: hidden;
+    }
+    .dropdown:hover .dropdown-content { display: block; }
+    .dropdown-content a {
+      color: #8c877c; padding: 12px 18px; text-decoration: none;
+      display: block; font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem;
+      border-bottom: 1px solid #1a1714; transition: background 0.2s, color 0.2s;
+    }
+    .dropdown-content a:last-child { border-bottom: none; }
+    .dropdown-content a:hover {
+      background-color: #161411; color: #f4f0e6;
+    }
+  </style>
+</head>
+<body class="textured-bg">
+
+<header>
+    <div class="brand">Paloma</div>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li class="dropdown">
+          <a href="visual.html" class="active">Visual</a>
+          <div class="dropdown-content">
+            <a href="photograhy.html">Photography</a>
+            <a href="illustration.html">Illustration</a>
+            <a href="drawings.html">Drawings</a>
+            <a href="collages.html">Collages</a>
+            <a href="video.html">Video</a>
+          </div>
+        </li>
+        <li><a href="audio.html">Audio</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="products.html">Products</a></li>
+      </ul>
+    </nav>
+  </header>
+
+  <div class="visual-stage-container">
+    
+    <aside id="sidebar">
+      <div class="collections-panel bevel-border">
+        <div class="panel-header">
+          <span class="title">Photography Collections</span>
+          <span class="count">101</span>
+        </div>
+        
+        <ul class="collection-list principal-collections">
+          <li class="principal-collection active" data-type="principal" data-collection="all">Show All principal<span class="sub-count">101</span></li>
+          <li class="principal-collection" data-type="principal" data-collection="above-surface">Above the surface<span class="sub-count">14</span></li>
+          <li class="principal-collection" data-type="principal" data-collection="below-surface">Below the surface<span class="sub-count">26</span></li>
+          <li class="principal-collection" data-type="principal" data-collection="into-nature">Into the nature<span class="sub-count">16</span></li>
+          <li class="principal-collection" data-type="principal" data-collection="on-concrete">On the concrete<span class="sub-count">17</span></li>
+          <li class="principal-collection" data-type="principal" data-collection="between-dreams">Between dreams<span class="sub-count">28</span></li>
+        </ul>
+      </div>
+
+      <div class="analogue-panel bevel-border">
+        <div class="panel-header">
+          <span class="title">Analogue Weird Formats</span>
+          <span class="count">45</span>
+        </div>
+        
+        <ul class="analogue-list analogue-collections">
+          <!-- Modificado: Añadido "Show All analogue" para solucionar el salto -->
+          <li class="analogue-collection" data-type="analogue" data-collection="all" style="display: none;">Show All analogue</li>
+          <li class="analogue-collection" data-type="analogue" data-collection="fisheye">Fisheye<span class="sub-count">9</span></li>
+          <li class="analogue-collection" data-type="analogue" data-collection="110mm">110mm<span class="sub-count">19</span></li>
+          <li class="analogue-collection" data-type="analogue" data-collection="3d">3D<span class="sub-count">17</span></li>
+        </ul>
+      </div>
+
+    </aside>
+
+    <main class="main-gallery">
+      
+      <div class="gallery-sub-header">
+        <span class="mono">MONO</span>
+        <p>CLICK ANY PHOTO TO VIEW FULL-SCREEN</p>
+      </div>
+
+      <div class="masonry-gallery-container grid-container">
+        <!-- Elemento de dimensionamiento para Masonry -->
+        <div class="grid-sizer"></div>
+
+        <div class="grid-item principal-item" data-type="principal" data-collection="above-surface">
+          <img src="images/photo/above/1.jpg" alt="Above the surface 1">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="above-surface">
+          <img src="images/photo/above/2.jpg" alt="Above the surface 2">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="above-surface">
+          <img src="images/photo/above/3.jpg" alt="Above the surface 3">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="above-surface">
+          <img src="images/photo/above/4.jpg" alt="Above the surface 4">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="above-surface">
+          <img src="images/photo/above/5.jpg" alt="Above the surface 5">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="above-surface">
+          <img src="images/photo/above/6.jpg" alt="Above the surface 6">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="above-surface">
+          <img src="images/photo/above/7.jpg" alt="Above the surface 7">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="above-surface">
+          <img src="images/photo/above/8.jpg" alt="Above the surface 8">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="above-surface">
+          <img src="images/photo/above/9.jpg" alt="Above the surface 9">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="above-surface">
+          <img src="images/photo/above/10.jpg" alt="Above the surface 10">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="above-surface">
+          <img src="images/photo/above/11.jpg" alt="Above the surface 11">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="above-surface">
+          <img src="images/photo/above/12.jpg" alt="Above the surface 12">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="above-surface">
+          <img src="images/photo/above/13.jpg" alt="Above the surface 13">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="above-surface">
+          <img src="images/photo/above/14.jpg" alt="Above the surface 14">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
+          <img src="images/photo/below/1.jpg" alt="Below the surface 1">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
+          <img src="images/photo/below/2.jpg" alt="Below the surface 2">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
+          <img src="images/photo/below/3.jpg" alt="Below the surface 3">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
+          <img src="images/photo/below/4.jpg" alt="Below the surface 4">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
+          <img src="images/photo/below/5.jpg" alt="Below the surface 5">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
+          <img src="images/photo/below/6.jpg" alt="Below the surface 6">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
+          <img src="images/photo/below/7.jpg" alt="Below the surface 7">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
+          <img src="images/photo/below/8.jpg" alt="Below the surface 8">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
+          <img src="images/photo/below/9.jpg" alt="Below the surface 9">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
+          <img src="images/photo/below/10.jpg" alt="Below the surface 10">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
+          <img src="images/photo/below/11.jpg" alt="Below the surface 11">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
+          <img src="images/photo/below/12.jpg" alt="Below the surface 12">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
+          <img src="images/photo/below/13.jpg" alt="Below the surface 13">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
+          <img src="images/photo/below/14.jpg" alt="Below the surface 14">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
+          <img src="images/photo/below/15.jpg" alt="Below the surface 15">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
+          <img src="images/photo/below/16.jpg" alt="Below the surface 16">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
+          <img src="images/photo/below/17.jpg" alt="Below the surface 17">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
+          <img src="images/photo/below/18.jpg" alt="Below the surface 18">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
+          <img src="images/photo/below/19.jpg" alt="Below the surface 19">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
+          <img src="images/photo/below/20.jpg" alt="Below the surface 20">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
+          <img src="images/photo/below/21.jpg" alt="Below the surface 21">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
+          <img src="images/photo/below/22.jpg" alt="Below the surface 22">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
+          <img src="images/photo/below/23.jpg" alt="Below the surface 23">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
+          <img src="images/photo/below/24.jpg" alt="Below the surface 24">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
+          <img src="images/photo/below/25.jpg" alt="Below the surface 25">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
+          <img src="images/photo/below/26.jpg" alt="Below the surface 26">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="into-nature">
+          <img src="images/photo/intothe/1.jpg" alt="Into the nature 1">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="into-nature">
+          <img src="images/photo/intothe/2.jpg" alt="Into the nature 2">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="into-nature">
+          <img src="images/photo/intothe/3.jpg" alt="Into the nature 3">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="into-nature">
+          <img src="images/photo/intothe/4.jpg" alt="Into the nature 4">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="into-nature">
+          <img src="images/photo/intothe/5.jpg" alt="Into the nature 5">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="into-nature">
+          <img src="images/photo/intothe/6.jpg" alt="Into the nature 6">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="into-nature">
+          <img src="images/photo/intothe/7.jpg" alt="Into the nature 7">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="into-nature">
+          <img src="images/photo/intothe/8.jpg" alt="Into the nature 8">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="into-nature">
+          <img src="images/photo/intothe/9.jpg" alt="Into the nature 9">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="into-nature">
+          <img src="images/photo/intothe/10.jpg" alt="Into the nature 10">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="into-nature">
+          <img src="images/photo/intothe/11.jpg" alt="Into the nature 11">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="into-nature">
+          <img src="images/photo/intothe/12.jpg" alt="Into the nature 12">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="into-nature">
+          <img src="images/photo/intothe/13.jpg" alt="Into the nature 13">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="into-nature">
+          <img src="images/photo/intothe/14.jpg" alt="Into the nature 14">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="into-nature">
+          <img src="images/photo/intothe/15.jpg" alt="Into the nature 15">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="into-nature">
+          <img src="images/photo/intothe/16.jpg" alt="Into the nature 16">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="on-concrete">
+          <img src="images/photo/onthe/1.jpg" alt="On the concrete 1">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="on-concrete">
+          <img src="images/photo/onthe/2.jpg" alt="On the concrete 2">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="on-concrete">
+          <img src="images/photo/onthe/3.jpg" alt="On the concrete 3">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="on-concrete">
+          <img src="images/photo/onthe/4.jpg" alt="On the concrete 4">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="on-concrete">
+          <img src="images/photo/onthe/5.jpg" alt="On the concrete 5">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="on-concrete">
+          <img src="images/photo/onthe/6.jpg" alt="On the concrete 6">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="on-concrete">
+          <img src="images/photo/onthe/7.jpg" alt="On the concrete 7">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="on-concrete">
+          <img src="images/photo/onthe/8.jpg" alt="On the concrete 8">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="on-concrete">
+          <img src="images/photo/onthe/9.jpg" alt="On the concrete 9">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="on-concrete">
+          <img src="images/photo/onthe/10.jpg" alt="On the concrete 10">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="on-concrete">
+          <img src="images/photo/onthe/11.jpg" alt="On the concrete 11">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="on-concrete">
+          <img src="images/photo/onthe/12.jpg" alt="On the concrete 12">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="on-concrete">
+          <img src="images/photo/onthe/13.jpg" alt="On the concrete 13">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="on-concrete">
+          <img src="images/photo/onthe/14.jpg" alt="On the concrete 14">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="on-concrete">
+          <img src="images/photo/onthe/15.jpg" alt="On the concrete 15">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="on-concrete">
+          <img src="images/photo/onthe/16.jpg" alt="On the concrete 16">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="on-concrete">
+          <img src="images/photo/onthe/17.jpg" alt="On the concrete 17">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
+          <img src="images/photo/between/1.jpg" alt="Between dreams 1">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
+          <img src="images/photo/between/2.jpg" alt="Between dreams 2">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
+          <img src="images/photo/between/3.jpg" alt="Between dreams 3">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
+          <img src="images/photo/between/4.jpg" alt="Between dreams 4">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
+          <img src="images/photo/between/5.jpg" alt="Between dreams 5">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
+          <img src="images/photo/between/6.jpg" alt="Between dreams 6">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
+          <img src="images/photo/between/7.jpg" alt="Between dreams 7">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
+          <img src="images/photo/between/8.jpg" alt="Between dreams 8">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
+          <img src="images/photo/between/9.jpg" alt="Between dreams 9">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
+          <img src="images/photo/between/10.jpg" alt="Between dreams 10">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
+          <img src="images/photo/between/11.jpg" alt="Between dreams 11">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
+          <img src="images/photo/between/12.jpg" alt="Between dreams 12">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
+          <img src="images/photo/between/13.jpg" alt="Between dreams 13">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
+          <img src="images/photo/between/14.jpg" alt="Between dreams 14">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
+          <img src="images/photo/between/15.jpg" alt="Between dreams 15">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
+          <img src="images/photo/between/16.jpg" alt="Between dreams 16">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
+          <img src="images/photo/between/17.jpg" alt="Between dreams 17">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
+          <img src="images/photo/between/18.jpg" alt="Between dreams 18">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
+          <img src="images/photo/between/19.jpg" alt="Between dreams 19">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
+          <img src="images/photo/between/20.jpg" alt="Between dreams 20">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
+          <img src="images/photo/between/21.jpg" alt="Between dreams 21">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
+          <img src="images/photo/between/22.jpg" alt="Between dreams 22">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
+          <img src="images/photo/between/23.jpg" alt="Between dreams 23">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
+          <img src="images/photo/between/24.jpg" alt="Between dreams 24">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
+          <img src="images/photo/between/25.jpg" alt="Between dreams 25">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
+          <img src="images/photo/between/26.jpg" alt="Between dreams 26">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
+          <img src="images/photo/between/27.jpg" alt="Between dreams 27">
+        </div>
+        <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
+          <img src="images/photo/between/28.jpg" alt="Between dreams 28">
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="fisheye">
+          <img src="images/photo/analogue/fisheye/1.jpg" alt="Fisheye 1">
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="fisheye">
+          <img src="images/photo/analogue/fisheye/2.jpg" alt="Fisheye 2">
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="fisheye">
+          <img src="images/photo/analogue/fisheye/3.jpg" alt="Fisheye 3">
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="fisheye">
+          <img src="images/photo/analogue/fisheye/4.jpg" alt="Fisheye 4">
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="fisheye">
+          <img src="images/photo/analogue/fisheye/5.jpg" alt="Fisheye 5">
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="fisheye">
+          <img src="images/photo/analogue/fisheye/6.jpg" alt="Fisheye 6">
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="fisheye">
+          <img src="images/photo/analogue/fisheye/7.jpg" alt="Fisheye 7">
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="fisheye">
+          <img src="images/photo/analogue/fisheye/8.jpg" alt="Fisheye 8">
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="fisheye">
+          <img src="images/photo/analogue/fisheye/9.jpg" alt="Fisheye 9">
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
+          <img src="images/photo/analogue/110mm/1.jpg" alt="110mm 1">
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
+          <img src="images/photo/analogue/110mm/2.jpg" alt="110mm 2">
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
+          <img src="images/photo/analogue/110mm/3.jpg" alt="110mm 3">
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
+          <img src="images/photo/analogue/110mm/4.jpg" alt="110mm 4">
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
+          <img src="images/photo/analogue/110mm/5.jpg" alt="110mm 5">
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
+          <img src="images/photo/analogue/110mm/6.jpg" alt="110mm 6">
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
+          <img src="images/photo/analogue/110mm/7.jpg" alt="110mm 7">
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
+          <img src="images/photo/analogue/110mm/8.jpg" alt="110mm 8">
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
+          <img src="images/photo/analogue/110mm/9.jpg" alt="110mm 9">
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
+          <img src="images/photo/analogue/110mm/10.jpg" alt="110mm 10">
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
+          <img src="images/photo/analogue/110mm/11.jpg" alt="110mm 11">
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
+          <img src="images/photo/analogue/110mm/12.jpg" alt="110mm 12">
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
+          <img src="images/photo/analogue/110mm/13.jpg" alt="110mm 13">
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
+          <img src="images/photo/analogue/110mm/14.jpg" alt="110mm 14">
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
+          <img src="images/photo/analogue/110mm/15.jpg" alt="110mm 15">
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
+          <img src="images/photo/analogue/110mm/16.jpg" alt="110mm 16">
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
+          <img src="images/photo/analogue/110mm/17.jpg" alt="110mm 17">
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
+          <img src="images/photo/analogue/110mm/18.jpg" alt="110mm 18">
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
+          <img src="images/photo/analogue/110mm/19.jpg" alt="110mm 19">
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="3d">
+          <video autoplay loop muted playsinline>
+             <source src="images/photo/analogue/3d/1.mp4" type="video/mp4">
+             Your browser does not support the video tag.
+          </video>
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="3d">
+          <video autoplay loop muted playsinline>
+             <source src="images/photo/analogue/3d/2.mp4" type="video/mp4">
+             Your browser does not support the video tag.
+          </video>
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="3d">
+          <video autoplay loop muted playsinline>
+             <source src="images/photo/analogue/3d/3.mp4" type="video/mp4">
+             Your browser does not support the video tag.
+          </video>
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="3d">
+          <video autoplay loop muted playsinline>
+             <source src="images/photo/analogue/3d/4.mp4" type="video/mp4">
+             Your browser does not support the video tag.
+          </video>
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="3d">
+          <video autoplay loop muted playsinline>
+             <source src="images/photo/analogue/3d/5.mp4" type="video/mp4">
+             Your browser does not support the video tag.
+          </video>
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="3d">
+          <video autoplay loop muted playsinline>
+             <source src="images/photo/analogue/3d/6.mp4" type="video/mp4">
+             Your browser does not support the video tag.
+          </video>
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="3d">
+          <video autoplay loop muted playsinline>
+             <source src="images/photo/analogue/3d/7.mp4" type="video/mp4">
+             Your browser does not support the video tag.
+          </video>
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="3d">
+          <video autoplay loop muted playsinline>
+             <source src="images/photo/analogue/3d/8.mp4" type="video/mp4">
+             Your browser does not support the video tag.
+          </video>
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="3d">
+          <video autoplay loop muted playsinline>
+             <source src="images/photo/analogue/3d/9.mp4" type="video/mp4">
+             Your browser does not support the video tag.
+          </video>
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="3d">
+          <video autoplay loop muted playsinline>
+             <source src="images/photo/analogue/3d/10.mp4" type="video/mp4">
+             Your browser does not support the video tag.
+          </video>
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="3d">
+          <video autoplay loop muted playsinline>
+             <source src="images/photo/analogue/3d/11.mp4" type="video/mp4">
+             Your browser does not support the video tag.
+          </video>
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="3d">
+          <video autoplay loop muted playsinline>
+             <source src="images/photo/analogue/3d/12.mp4" type="video/mp4">
+             Your browser does not support the video tag.
+          </video>
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="3d">
+          <video autoplay loop muted playsinline>
+             <source src="images/photo/analogue/3d/13.mp4" type="video/mp4">
+             Your browser does not support the video tag.
+          </video>
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="3d">
+          <video autoplay loop muted playsinline>
+             <source src="images/photo/analogue/3d/14.mp4" type="video/mp4">
+             Your browser does not support the video tag.
+          </video>
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="3d">
+          <video autoplay loop muted playsinline>
+             <source src="images/photo/analogue/3d/15.mp4" type="video/mp4">
+             Your browser does not support the video tag.
+          </video>
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="3d">
+          <video autoplay loop muted playsinline>
+             <source src="images/photo/analogue/3d/16.mp4" type="video/mp4">
+             Your browser does not support the video tag.
+          </video>
+        </div>
+        <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="3d">
+          <video autoplay loop muted playsinline>
+             <source src="images/photo/analogue/3d/17.mp4" type="video/mp4">
+             Your browser does not support the video tag.
+          </video>
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <div id="fullScreenModal" class="modal">
+    <span class="close-modal">&times;</span>
+    <img class="modal-content" id="modalImage" style="display: none;">
+    <video class="modal-content" id="modalVideo" autoplay loop muted playsinline style="display: none;"></video>
+  </div>
+
+  <!-- SCRIPTS -->
+  <script>
+    document.addEventListener('DOMContentLoaded', function() {
+        
+        const grid = document.querySelector('.masonry-gallery-container');
+        
+        // Modificado: Inicialización más robusta de Masonry
+        const msnry = new Masonry( grid, {
+            itemSelector: '.grid-item:not(.hidden)', // Solo elementos no ocultos
+            columnWidth: '.grid-sizer', // Usar sizer estático
+            percentPosition: true,
+            gutter: 10,
+            horizontalOrder: true,
+            transitionDuration: '0.2s'
+        });
+
+        // Recalcular layout cuando carguen las imágenes
+        imagesLoaded( grid ).on( 'progress', function() {
+          msnry.layout();
+        });
+        
+        // Recalcular con videos
+        const videos = grid.querySelectorAll('video');
+        videos.forEach(vid => {
+            vid.addEventListener('loadeddata', function() {
+                msnry.layout();
+            });
+        });
+
+        const modal = document.getElementById('fullScreenModal');
+        const modalImg = document.getElementById('modalImage');
+        const modalVid = document.getElementById('modalVideo');
+        const closeBtn = document.querySelector('.close-modal');
+        const gridItems = document.querySelectorAll('.grid-item');
+
+        gridItems.forEach(item => {
+            item.addEventListener('click', function() {
+                const img = this.querySelector('img');
+                const vid = this.querySelector('video');
+
+                if (img) {
+                    modalImg.src = img.src;
+                    modalImg.style.display = 'block';
+                    modalVid.style.display = 'none';
+                    modalVid.pause();
+                } else if (vid) {
+                    const source = vid.querySelector('source');
+                    modalVid.src = source ? source.src : vid.src;
+                    modalVid.style.display = 'block';
+                    modalImg.style.display = 'none';
+                    modalVid.play();
+                }
+
+                modal.classList.add('show');
+            });
+        });
+
+        function closeModalFunc() {
+            modal.classList.remove('show');
+            modalVid.pause();
+            modalVid.removeAttribute('src');
+        }
+
+        closeBtn.addEventListener('click', closeModalFunc);
+        modalImg.addEventListener('click', closeModalFunc);
+        modalVid.addEventListener('click', closeModalFunc);
+
+        document.addEventListener('keydown', function(event) {
+            if (event.key === 'Escape' && modal.classList.contains('show')) {
+                closeModalFunc();
+            }
+        });
+
+        grid.addEventListener('contextmenu', function(event) {
+            event.preventDefault();
+            return false;
+        });
+
+        grid.querySelectorAll('img, video').forEach(el => {
+            el.addEventListener('dragstart', function(event) {
+                event.preventDefault();
+            });
+        });
+
+        // Modificado: Lógica de filtrado mejorada
+        function filterGallery(msnry, type, collection) {
+            const allItems = document.querySelectorAll('.grid-item');
+            
+            allItems.forEach(item => {
+                let shouldShow = false;
+
+                if (type === 'principal') {
+                    if (item.dataset.type === 'principal' && (collection === 'all' || item.dataset.collection === collection)) {
+                        shouldShow = true;
+                    }
+                } else if (type === 'analogue') {
+                    if (item.dataset.type === 'analogue' && (collection === 'all' || item.dataset.collection === collection)) {
+                        shouldShow = true;
+                    }
+                }
+
+                if (shouldShow) {
+                    item.classList.remove('hidden');
+                } else {
+                    item.classList.add('hidden');
+                }
+            });
+
+            // Forzar recálculo del layout y decirle a Masonry que vuelva a buscar los elementos
+            msnry.reloadItems(); 
+            msnry.layout();
+            
+            // Pequeño timeout por si las imágenes/videos de la nueva sección aún no han renderizado su altura
+            setTimeout(() => {
+                msnry.layout();
+            }, 100);
+        }
+
+        const principalItems = document.querySelectorAll('.principal-collections li');
+        const analogueItems = document.querySelectorAll('.analogue-collections li');
+        const allMenuItems = [...principalItems, ...analogueItems];
+
+        principalItems.forEach(item => {
+          item.addEventListener('click', function() {
+            allMenuItems.forEach(li => li.classList.remove('active'));
+            this.classList.add('active');
+            filterGallery(msnry, 'principal', this.dataset.collection);
+          });
+        });
+
+        analogueItems.forEach(item => {
+          item.addEventListener('click', function() {
+            allMenuItems.forEach(li => li.classList.remove('active'));
+            this.classList.add('active');
+            filterGallery(msnry, 'analogue', this.dataset.collection);
+          });
+        });
+
+        // Inicialización
+        // Primero, nos aseguramos de que todos los analógicos estén ocultos por defecto
+        document.querySelectorAll('.analogue-item').forEach(el => el.classList.add('hidden'));
+        filterGallery(msnry, 'principal', 'all');
+
+    });
+  </script>
+</body>
+</html>
