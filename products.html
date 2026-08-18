@@ -92,16 +92,16 @@
       position: relative; overflow: hidden;
     }
 
-    /* Placeholders - REPLACE WITH ACTUAL IMAGES e.g. background-image: url('images/racket_1.png') */
+    /* Placeholders - REPLACE WITH ACTUAL IMAGES e.g. background-image: url('images/racket_1.webp') */
     .product-image::after {
       content: ""; position: absolute; top: 0; left: 0; right: 0; bottom: 0;
       background-size: cover; background-position: center;
       transition: transform 0.6s ease;
     }
-    .img-padel::after { background-image: url('images/illustration_1_1.png'); } 
-    .img-print::after { background-image: url('images/illustration_1_2.png'); filter: grayscale(100%); }
-    .img-web::after { background-image: url('images/illustration_2_1.png'); }
-    .img-audio::after { background-image: url('images/illustration_1_3.png'); }
+    .img-padel::after { background-image: url('images/illustration_1_1.webp'); } 
+    .img-print::after { background-image: url('images/illustration_1_2.webp'); filter: grayscale(100%); }
+    .img-web::after { background-image: url('images/illustration_2_1.webp'); }
+    .img-audio::after { background-image: url('images/illustration_1_3.webp'); }
 
     .product-title { font-family: var(--font-serif); font-size: 1.5rem; font-weight: 500; margin-bottom: 0.5rem; }
     .product-desc { font-family: var(--font-mono); font-size: 0.75rem; color: var(--ink-muted); letter-spacing: 0.05em; margin-bottom: 2rem; flex-grow: 1; }
@@ -276,10 +276,10 @@
       
       <!-- *** IMPORTANT *** -->
       <!-- 'openContact' function now accepts arrays for different images -->
-      <!-- Reemplaza 'images/product_X_Y.png' con las rutas reales de tus imágenes -->
+      <!-- Reemplaza 'images/product_X_Y.webp' con las rutas reales de tus imágenes -->
       
       <!-- Product 1 -->
-      <div class="product-card" onclick="openContact('Custom Padel Racket Artwork', 'Customization options: Japanese Waves, Classical Art, Playing Cards, Sun/Moon motifs.', ['images/illustration_1_1.png', 'images/illustration_1_1_detail1.png', 'images/illustration_1_1_detail2.png'])">
+      <div class="product-card" onclick="openContact('Custom Padel Racket Artwork', 'Customization options: Japanese Waves, Classical Art, Playing Cards, Sun/Moon motifs.', ['images/illustration_1_1.webp', 'images/illustration_1_1_detail1.webp', 'images/illustration_1_1_detail2.webp'])">
         <div class="product-image img-padel"></div>
         <h3 class="product-title">Custom Padel Racket Artwork</h3>
         <p class="product-desc">Hand-painted & vector art adaptations for your racket. Japanese waves, card suits, or minimalist motifs.</p>
@@ -290,7 +290,7 @@
       </div>
 
       <!-- Product 2 -->
-      <div class="product-card" onclick="openContact('Analog Photographic Prints', 'Customization options: Above/Below surface, Ethereal, Concrete. Formats: Standard, 110mm, Fisheye, 3D.', ['images/illustration_1_2.png', 'images/prints_layout.png', 'images/print_fisheye_example.png'])">
+      <div class="product-card" onclick="openContact('Analog Photographic Prints', 'Customization options: Above/Below surface, Ethereal, Concrete. Formats: Standard, 110mm, Fisheye, 3D.', ['images/illustration_1_2.webp', 'images/prints_layout.webp', 'images/print_fisheye_example.webp'])">
         <div class="product-image img-print"></div>
         <h3 class="product-title">Analog Photographic Prints</h3>
         <p class="product-desc">Hand-developed prints from my archive. Ethereal, underwater, or weird formats (110mm, Fisheye, Stereo 3D).</p>
@@ -301,7 +301,7 @@
       </div>
 
       <!-- Product 3 -->
-      <div class="product-card" onclick="openContact('Interactive Web Interfaces', 'Customization options: Personal Portfolio, Image Galleries, Custom HTML/CSS/JS structural code.', ['images/illustration_2_1.png', 'images/web_interface_detail.png'])">
+      <div class="product-card" onclick="openContact('Interactive Web Interfaces', 'Customization options: Personal Portfolio, Image Galleries, Custom HTML/CSS/JS structural code.', ['images/illustration_2_1.webp', 'images/web_interface_detail.webp'])">
         <div class="product-image img-web"></div>
         <h3 class="product-title">Interactive Web Interfaces</h3>
         <p class="product-desc">Bespoke portfolio websites or interactive launchers built from scratch with HTML, CSS, and JS.</p>
@@ -312,7 +312,7 @@
       </div>
 
       <!-- Product 4 -->
-      <div class="product-card" onclick="openContact('Curated Audio Set', 'Customization options: Ambient Drift, Forest Rave, Desert Sunset, Subterranean Pulse.', ['images/illustration_1_3.png', 'images/audio_setup.png'])">
+      <div class="product-card" onclick="openContact('Curated Audio Set', 'Customization options: Ambient Drift, Forest Rave, Desert Sunset, Subterranean Pulse.', ['images/illustration_1_3.webp', 'images/audio_setup.webp'])">
         <div class="product-image img-audio"></div>
         <h3 class="product-title">Curated Audio Set</h3>
         <p class="product-desc">A personalized live mix or processed audio set. Perfect for specific events, campouts, or deep listening.</p>
