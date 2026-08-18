@@ -63,10 +63,11 @@
       pointer-events: none;
     }
 
+ /* --- NAVEGACIÓN --- */
     header {
-      background: #060709;
-      border-bottom: 1px solid #1a1e26;
-      padding: 1.1rem 2.5rem;
+      background: transparent;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 1.5rem 3rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -77,8 +78,8 @@
       z-index: 50;
     }
 
-    header h1 {
-      color: var(--silver-text);
+    .brand {
+      color: var(--ink-white);
       font-weight: 500;
       letter-spacing: 0.18em;
     }
@@ -86,31 +87,30 @@
     nav ul {
       display: flex;
       list-style: none;
-      gap: 2rem;
+      gap: 2.5rem;
     }
 
     nav a {
       color: var(--ink-muted);
       text-decoration: none;
-      transition: color 0.25s ease;
+      transition: color 0.3s ease;
       position: relative;
     }
 
-    nav a:hover,
-    nav a.active {
-      color: var(--silver-text);
+    nav a:hover, nav a.active {
+      color: var(--ink-white);
     }
 
     nav a.active::after {
       content: "";
       position: absolute;
-      bottom: -4px;
+      bottom: -6px;
       left: 0;
       width: 100%;
-      height: 2px;
-      background: linear-gradient(180deg, var(--ink-muted), var(--bg-dark));
-      box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
+      height: 1px;
+      background: var(--ink-white);
     }
+
 
     /* --- MENÚ DESPLEGABLE UNIVERSAL --- */
     .dropdown { position: relative; }
