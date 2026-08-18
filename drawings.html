@@ -40,7 +40,8 @@
     }
 
     /* --- TOP NAVIGATION --- */
-  header {
+ 
+    header {
       background: transparent;
       border-bottom: 1px solid rgba(255, 255, 255, 0.05);
       padding: 1.5rem 3rem;
@@ -223,19 +224,14 @@
     .spread {
       position: absolute;
       inset: 0;
-      display: flex;
-      opacity: 0;
-      pointer-events: none;
-      transition: opacity 0.4s ease;
+      display: none; /* Cambiado de opacity: 0 a display: none para evitar solapamientos */
       z-index: 1;
     }
 
     .spread.active {
-      opacity: 1;
-      pointer-events: auto;
+      display: flex; /* Se muestra directamente cuando está activo */
       z-index: 2;
     }
-
     .page {
       flex: 1;
       padding: 3.5rem 3rem 2.5rem;
@@ -660,7 +656,6 @@
       const secondNum = String(Math.min((currentSpread + 1) * 2, totalSpreads * 2)).padStart(2, '0');
       pageIndicator.textContent = `Plates ${firstNum} – ${secondNum}`;
     }
-
 function turnPage(direction) {
       if (isAnimating) return;
       const targetSpread = currentSpread + direction;
@@ -676,24 +671,23 @@ function turnPage(direction) {
         leafFront.innerHTML = currentSpreadEl.querySelector('.page-right').innerHTML;
         leafBack.innerHTML = nextSpreadEl.querySelector('.page-left').innerHTML;
 
+        // Ocultar página derecha actual y preparar la hoja de giro
+        currentSpreadEl.querySelector('.page-right').style.visibility = 'hidden';
         flipLeaf.className = 'flip-leaf flipping-next';
 
-        // 1. Ocultar inmediatamente la página que empieza a girar
-        currentSpreadEl.querySelector('.page-right').style.visibility = 'hidden';
-
-        // 2. Revelar la página destino exactamente a la mitad del giro (375ms, cuando la hoja tapa el centro)
+        // A la mitad del giro, ocultar el spread viejo y activar el nuevo debajo
         setTimeout(() => {
+          currentSpreadEl.classList.remove('active');
+          currentSpreadEl.querySelector('.page-right').style.visibility = '';
           nextSpreadEl.classList.add('active');
         }, 375);
 
-        // 3. Finalizar la animación
+        // Finalizar
         setTimeout(() => {
-          currentSpreadEl.classList.remove('active');
-          currentSpreadEl.querySelector('.page-right').style.visibility = ''; // Restaurar
-          currentSpread = targetSpread;
           flipLeaf.className = 'flip-leaf';
-          updateButtons();
           isAnimating = false;
+          currentSpread = targetSpread;
+          updateButtons();
         }, 750);
 
       } else {
@@ -701,27 +695,25 @@ function turnPage(direction) {
         leafFront.innerHTML = currentSpreadEl.querySelector('.page-left').innerHTML;
         leafBack.innerHTML = nextSpreadEl.querySelector('.page-right').innerHTML;
 
+        currentSpreadEl.querySelector('.page-left').style.visibility = 'hidden';
         flipLeaf.className = 'flip-leaf flipping-prev';
 
-        // 1. Ocultar inmediatamente la página que empieza a girar
-        currentSpreadEl.querySelector('.page-left').style.visibility = 'hidden';
-
-        // 2. Revelar la página destino a la mitad del giro
         setTimeout(() => {
+          currentSpreadEl.classList.remove('active');
+          currentSpreadEl.querySelector('.page-left').style.visibility = '';
           nextSpreadEl.classList.add('active');
         }, 375);
 
-        // 3. Finalizar la animación
         setTimeout(() => {
-          currentSpreadEl.classList.remove('active');
-          currentSpreadEl.querySelector('.page-left').style.visibility = ''; // Restaurar
-          currentSpread = targetSpread;
           flipLeaf.className = 'flip-leaf';
-          updateButtons();
           isAnimating = false;
+          currentSpread = targetSpread;
+          updateButtons();
         }, 750);
       }
     }
+
+
     /* --- LIGHTBOX FUNCTIONS --- */
     function openLightbox(src, captionText) {
       lightboxImg.src = src;
