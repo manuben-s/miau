@@ -40,6 +40,15 @@
       user-select: none; /* Prevents text selection on full-page */
     }
 
+          /* Evita la selección de texto e imágenes en general */
+      img, video, .grid-item, .scrap-item, .spread {
+        -webkit-user-select: none;
+        -moz-user-select: none;
+        -ms-user-select: none;
+        user-select: none;
+        -webkit-touch-callout: none;
+      }
+
     /* --- NAVIGATION --- */
     header {
       background: transparent;
