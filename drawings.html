@@ -326,6 +326,9 @@
       animation: flipPrev 0.75s cubic-bezier(0.645, 0.045, 0.355, 1) forwards;
     }
 
+
+
+    /* --- 3D FLIP EFFECT --- */
     .leaf-face {
       position: absolute;
       inset: 0;
@@ -336,6 +339,13 @@
         linear-gradient(to right, rgba(0,0,0,0.02) 1px, transparent 1px);
       background-size: 16px 16px, 100% 100%;
       overflow: hidden;
+
+      /* AÑADIR ESTAS LÍNEAS PARA REPLICAR LA ESTRUCTURA DE .page */
+      padding: 3.5rem 3rem 2.5rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: space-between;
     }
 
     .leaf-face.back {
