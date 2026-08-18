@@ -3,7 +3,7 @@
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Visual - Paloma Photography (Todo en Uno y Filtrable)</title>
+  <title>Paloma — Photography Archive</title>
   
   <!-- 1. TIPOGRAFÍAS (Google Fonts) -->
   <link rel="preconnect" href="https://fonts.googleapis.com">
@@ -112,6 +112,29 @@
       box-shadow: 0 0 8px rgba(255, 255, 255, 0.3);
     }
 
+    /* --- MENÚ DESPLEGABLE UNIVERSAL --- */
+    .dropdown { position: relative; }
+    .dropdown-content {
+      display: none; position: absolute; top: 100%; left: -15px;
+      background-color: #0a0908; min-width: 140px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+      border: 1px solid #211e19; border-radius: 2px;
+      z-index: 100; overflow: hidden;
+    }
+    .dropdown:hover .dropdown-content { display: block; }
+    .dropdown-content a {
+      color: #8c877c; padding: 12px 18px; text-decoration: none;
+      display: block; font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem;
+      border-bottom: 1px solid #1a1714; transition: background 0.2s, color 0.2s;
+    }
+    .dropdown-content a:last-child { border-bottom: none; }
+    .dropdown-content a:hover {
+      background-color: #161411; color: #f4f0e6;
+    }
+    /* El enlace activo dentro del desplegable no necesita la raya inferior larga */
+    .dropdown-content a.active::after { display: none; }
+    .dropdown-content a.active { color: var(--silver-text); background-color: #161411; }
+
     .visual-stage-container {
       flex: 1;
       display: flex;
@@ -219,19 +242,17 @@
       color: var(--silver-text);
     }
 
-    /* Modificado: Contenedor Masonry al 100% */
     .masonry-gallery-container {
       display: block;
       width: 100%;
     }
 
-    /* Modificado: Asegurar que los items filtrados no afecten al layout */
     .grid-item {
       width: calc(20% - 10px);
       margin-bottom: 10px;
       border-radius: 6px;
       overflow: hidden;
-      position: absolute; /* Masonry requiere posicionamiento absoluto internamente, pero es mejor definirlo explícitamente a veces */
+      position: absolute;
       border: 1px solid rgba(0, 0, 0, 0.4);
       box-shadow: 
         inset 0 1px 0 var(--bevel-light),
@@ -240,12 +261,11 @@
       transition: transform 0.2s, box-shadow 0.2s, opacity 0.2s, visibility 0.2s;
     }
 
-    /* Ocultar elementos de forma robusta para Masonry */
     .grid-item.hidden {
       display: none !important;
       opacity: 0;
       visibility: hidden;
-      position: absolute; /* Evita que ocupen espacio en el flujo normal si fallara el display: none */
+      position: absolute;
     }
 
     .grid-item:hover {
@@ -261,7 +281,6 @@
       display: block;
     }
 
-    /* Elemento para fijar el ancho de columna (Sizer) - CLAVE PARA MASONRY */
     .grid-sizer {
       width: calc(20% - 10px);
     }
@@ -335,30 +354,12 @@
         width: calc(33.33% - 10px);
       }
     }
-    /* --- MENÚ DESPLEGABLE UNIVERSAL --- */
-    .dropdown { position: relative; }
-    .dropdown-content {
-      display: none; position: absolute; top: 100%; left: -15px;
-      background-color: #0a0908; min-width: 140px;
-      box-shadow: 0 15px 35px rgba(0,0,0,0.8);
-      border: 1px solid #211e19; border-radius: 2px;
-      z-index: 100; overflow: hidden;
-    }
-    .dropdown:hover .dropdown-content { display: block; }
-    .dropdown-content a {
-      color: #8c877c; padding: 12px 18px; text-decoration: none;
-      display: block; font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem;
-      border-bottom: 1px solid #1a1714; transition: background 0.2s, color 0.2s;
-    }
-    .dropdown-content a:last-child { border-bottom: none; }
-    .dropdown-content a:hover {
-      background-color: #161411; color: #f4f0e6;
-    }
   </style>
 </head>
 <body class="textured-bg">
 
-<header>
+  <!-- HEADER -->
+  <header>
     <div class="brand">Paloma</div>
     <nav>
       <ul>
@@ -366,7 +367,7 @@
         <li class="dropdown">
           <a href="visual.html" class="active">Visual</a>
           <div class="dropdown-content">
-            <a href="photography.html">Photography</a>
+            <a href="photography.html" class="active">Photography</a>
             <a href="illustration.html">Illustration</a>
             <a href="drawings.html">Drawings</a>
             <a href="collages.html">Collages</a>
@@ -406,8 +407,7 @@
         </div>
         
         <ul class="analogue-list analogue-collections">
-          <!-- Modificado: Añadido "Show All analogue" para solucionar el salto -->
-          <li class="analogue-collection" data-type="analogue" data-collection="all" style="display: none;">Show All analogue</li>
+          <li class="analogue-collection" data-type="analogue" data-collection="all">Show All Analogue<span class="sub-count">45</span></li>
           <li class="analogue-collection" data-type="analogue" data-collection="fisheye">Fisheye<span class="sub-count">9</span></li>
           <li class="analogue-collection" data-type="analogue" data-collection="110mm">110mm<span class="sub-count">19</span></li>
           <li class="analogue-collection" data-type="analogue" data-collection="3d">3D<span class="sub-count">17</span></li>
@@ -423,396 +423,396 @@
         <p>CLICK ANY PHOTO TO VIEW FULL-SCREEN</p>
       </div>
 
+      <!-- GALERÍA OPTIMIZADA CON WEBP Y LAZY LOADING -->
       <div class="masonry-gallery-container grid-container">
-        <!-- Elemento de dimensionamiento para Masonry -->
         <div class="grid-sizer"></div>
 
         <div class="grid-item principal-item" data-type="principal" data-collection="above-surface">
-          <img src="images/photo/above/1.jpg" alt="Above the surface 1">
+          <img src="images/photo/above/1.webp" loading="lazy" alt="Above the surface 1">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="above-surface">
-          <img src="images/photo/above/2.jpg" alt="Above the surface 2">
+          <img src="images/photo/above/2.webp" loading="lazy" alt="Above the surface 2">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="above-surface">
-          <img src="images/photo/above/3.jpg" alt="Above the surface 3">
+          <img src="images/photo/above/3.webp" loading="lazy" alt="Above the surface 3">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="above-surface">
-          <img src="images/photo/above/4.jpg" alt="Above the surface 4">
+          <img src="images/photo/above/4.webp" loading="lazy" alt="Above the surface 4">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="above-surface">
-          <img src="images/photo/above/5.jpg" alt="Above the surface 5">
+          <img src="images/photo/above/5.webp" loading="lazy" alt="Above the surface 5">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="above-surface">
-          <img src="images/photo/above/6.jpg" alt="Above the surface 6">
+          <img src="images/photo/above/6.webp" loading="lazy" alt="Above the surface 6">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="above-surface">
-          <img src="images/photo/above/7.jpg" alt="Above the surface 7">
+          <img src="images/photo/above/7.webp" loading="lazy" alt="Above the surface 7">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="above-surface">
-          <img src="images/photo/above/8.jpg" alt="Above the surface 8">
+          <img src="images/photo/above/8.webp" loading="lazy" alt="Above the surface 8">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="above-surface">
-          <img src="images/photo/above/9.jpg" alt="Above the surface 9">
+          <img src="images/photo/above/9.webp" loading="lazy" alt="Above the surface 9">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="above-surface">
-          <img src="images/photo/above/10.jpg" alt="Above the surface 10">
+          <img src="images/photo/above/10.webp" loading="lazy" alt="Above the surface 10">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="above-surface">
-          <img src="images/photo/above/11.jpg" alt="Above the surface 11">
+          <img src="images/photo/above/11.webp" loading="lazy" alt="Above the surface 11">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="above-surface">
-          <img src="images/photo/above/12.jpg" alt="Above the surface 12">
+          <img src="images/photo/above/12.webp" loading="lazy" alt="Above the surface 12">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="above-surface">
-          <img src="images/photo/above/13.jpg" alt="Above the surface 13">
+          <img src="images/photo/above/13.webp" loading="lazy" alt="Above the surface 13">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="above-surface">
-          <img src="images/photo/above/14.jpg" alt="Above the surface 14">
+          <img src="images/photo/above/14.webp" loading="lazy" alt="Above the surface 14">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
-          <img src="images/photo/below/1.jpg" alt="Below the surface 1">
+          <img src="images/photo/below/1.webp" loading="lazy" alt="Below the surface 1">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
-          <img src="images/photo/below/2.jpg" alt="Below the surface 2">
+          <img src="images/photo/below/2.webp" loading="lazy" alt="Below the surface 2">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
-          <img src="images/photo/below/3.jpg" alt="Below the surface 3">
+          <img src="images/photo/below/3.webp" loading="lazy" alt="Below the surface 3">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
-          <img src="images/photo/below/4.jpg" alt="Below the surface 4">
+          <img src="images/photo/below/4.webp" loading="lazy" alt="Below the surface 4">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
-          <img src="images/photo/below/5.jpg" alt="Below the surface 5">
+          <img src="images/photo/below/5.webp" loading="lazy" alt="Below the surface 5">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
-          <img src="images/photo/below/6.jpg" alt="Below the surface 6">
+          <img src="images/photo/below/6.webp" loading="lazy" alt="Below the surface 6">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
-          <img src="images/photo/below/7.jpg" alt="Below the surface 7">
+          <img src="images/photo/below/7.webp" loading="lazy" alt="Below the surface 7">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
-          <img src="images/photo/below/8.jpg" alt="Below the surface 8">
+          <img src="images/photo/below/8.webp" loading="lazy" alt="Below the surface 8">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
-          <img src="images/photo/below/9.jpg" alt="Below the surface 9">
+          <img src="images/photo/below/9.webp" loading="lazy" alt="Below the surface 9">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
-          <img src="images/photo/below/10.jpg" alt="Below the surface 10">
+          <img src="images/photo/below/10.webp" loading="lazy" alt="Below the surface 10">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
-          <img src="images/photo/below/11.jpg" alt="Below the surface 11">
+          <img src="images/photo/below/11.webp" loading="lazy" alt="Below the surface 11">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
-          <img src="images/photo/below/12.jpg" alt="Below the surface 12">
+          <img src="images/photo/below/12.webp" loading="lazy" alt="Below the surface 12">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
-          <img src="images/photo/below/13.jpg" alt="Below the surface 13">
+          <img src="images/photo/below/13.webp" loading="lazy" alt="Below the surface 13">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
-          <img src="images/photo/below/14.jpg" alt="Below the surface 14">
+          <img src="images/photo/below/14.webp" loading="lazy" alt="Below the surface 14">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
-          <img src="images/photo/below/15.jpg" alt="Below the surface 15">
+          <img src="images/photo/below/15.webp" loading="lazy" alt="Below the surface 15">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
-          <img src="images/photo/below/16.jpg" alt="Below the surface 16">
+          <img src="images/photo/below/16.webp" loading="lazy" alt="Below the surface 16">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
-          <img src="images/photo/below/17.jpg" alt="Below the surface 17">
+          <img src="images/photo/below/17.webp" loading="lazy" alt="Below the surface 17">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
-          <img src="images/photo/below/18.jpg" alt="Below the surface 18">
+          <img src="images/photo/below/18.webp" loading="lazy" alt="Below the surface 18">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
-          <img src="images/photo/below/19.jpg" alt="Below the surface 19">
+          <img src="images/photo/below/19.webp" loading="lazy" alt="Below the surface 19">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
-          <img src="images/photo/below/20.jpg" alt="Below the surface 20">
+          <img src="images/photo/below/20.webp" loading="lazy" alt="Below the surface 20">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
-          <img src="images/photo/below/21.jpg" alt="Below the surface 21">
+          <img src="images/photo/below/21.webp" loading="lazy" alt="Below the surface 21">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
-          <img src="images/photo/below/22.jpg" alt="Below the surface 22">
+          <img src="images/photo/below/22.webp" loading="lazy" alt="Below the surface 22">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
-          <img src="images/photo/below/23.jpg" alt="Below the surface 23">
+          <img src="images/photo/below/23.webp" loading="lazy" alt="Below the surface 23">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
-          <img src="images/photo/below/24.jpg" alt="Below the surface 24">
+          <img src="images/photo/below/24.webp" loading="lazy" alt="Below the surface 24">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
-          <img src="images/photo/below/25.jpg" alt="Below the surface 25">
+          <img src="images/photo/below/25.webp" loading="lazy" alt="Below the surface 25">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="below-surface">
-          <img src="images/photo/below/26.jpg" alt="Below the surface 26">
+          <img src="images/photo/below/26.webp" loading="lazy" alt="Below the surface 26">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="into-nature">
-          <img src="images/photo/intothe/1.jpg" alt="Into the nature 1">
+          <img src="images/photo/intothe/1.webp" loading="lazy" alt="Into the nature 1">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="into-nature">
-          <img src="images/photo/intothe/2.jpg" alt="Into the nature 2">
+          <img src="images/photo/intothe/2.webp" loading="lazy" alt="Into the nature 2">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="into-nature">
-          <img src="images/photo/intothe/3.jpg" alt="Into the nature 3">
+          <img src="images/photo/intothe/3.webp" loading="lazy" alt="Into the nature 3">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="into-nature">
-          <img src="images/photo/intothe/4.jpg" alt="Into the nature 4">
+          <img src="images/photo/intothe/4.webp" loading="lazy" alt="Into the nature 4">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="into-nature">
-          <img src="images/photo/intothe/5.jpg" alt="Into the nature 5">
+          <img src="images/photo/intothe/5.webp" loading="lazy" alt="Into the nature 5">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="into-nature">
-          <img src="images/photo/intothe/6.jpg" alt="Into the nature 6">
+          <img src="images/photo/intothe/6.webp" loading="lazy" alt="Into the nature 6">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="into-nature">
-          <img src="images/photo/intothe/7.jpg" alt="Into the nature 7">
+          <img src="images/photo/intothe/7.webp" loading="lazy" alt="Into the nature 7">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="into-nature">
-          <img src="images/photo/intothe/8.jpg" alt="Into the nature 8">
+          <img src="images/photo/intothe/8.webp" loading="lazy" alt="Into the nature 8">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="into-nature">
-          <img src="images/photo/intothe/9.jpg" alt="Into the nature 9">
+          <img src="images/photo/intothe/9.webp" loading="lazy" alt="Into the nature 9">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="into-nature">
-          <img src="images/photo/intothe/10.jpg" alt="Into the nature 10">
+          <img src="images/photo/intothe/10.webp" loading="lazy" alt="Into the nature 10">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="into-nature">
-          <img src="images/photo/intothe/11.jpg" alt="Into the nature 11">
+          <img src="images/photo/intothe/11.webp" loading="lazy" alt="Into the nature 11">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="into-nature">
-          <img src="images/photo/intothe/12.jpg" alt="Into the nature 12">
+          <img src="images/photo/intothe/12.webp" loading="lazy" alt="Into the nature 12">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="into-nature">
-          <img src="images/photo/intothe/13.jpg" alt="Into the nature 13">
+          <img src="images/photo/intothe/13.webp" loading="lazy" alt="Into the nature 13">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="into-nature">
-          <img src="images/photo/intothe/14.jpg" alt="Into the nature 14">
+          <img src="images/photo/intothe/14.webp" loading="lazy" alt="Into the nature 14">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="into-nature">
-          <img src="images/photo/intothe/15.jpg" alt="Into the nature 15">
+          <img src="images/photo/intothe/15.webp" loading="lazy" alt="Into the nature 15">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="into-nature">
-          <img src="images/photo/intothe/16.jpg" alt="Into the nature 16">
+          <img src="images/photo/intothe/16.webp" loading="lazy" alt="Into the nature 16">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="on-concrete">
-          <img src="images/photo/onthe/1.jpg" alt="On the concrete 1">
+          <img src="images/photo/onthe/1.webp" loading="lazy" alt="On the concrete 1">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="on-concrete">
-          <img src="images/photo/onthe/2.jpg" alt="On the concrete 2">
+          <img src="images/photo/onthe/2.webp" loading="lazy" alt="On the concrete 2">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="on-concrete">
-          <img src="images/photo/onthe/3.jpg" alt="On the concrete 3">
+          <img src="images/photo/onthe/3.webp" loading="lazy" alt="On the concrete 3">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="on-concrete">
-          <img src="images/photo/onthe/4.jpg" alt="On the concrete 4">
+          <img src="images/photo/onthe/4.webp" loading="lazy" alt="On the concrete 4">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="on-concrete">
-          <img src="images/photo/onthe/5.jpg" alt="On the concrete 5">
+          <img src="images/photo/onthe/5.webp" loading="lazy" alt="On the concrete 5">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="on-concrete">
-          <img src="images/photo/onthe/6.jpg" alt="On the concrete 6">
+          <img src="images/photo/onthe/6.webp" loading="lazy" alt="On the concrete 6">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="on-concrete">
-          <img src="images/photo/onthe/7.jpg" alt="On the concrete 7">
+          <img src="images/photo/onthe/7.webp" loading="lazy" alt="On the concrete 7">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="on-concrete">
-          <img src="images/photo/onthe/8.jpg" alt="On the concrete 8">
+          <img src="images/photo/onthe/8.webp" loading="lazy" alt="On the concrete 8">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="on-concrete">
-          <img src="images/photo/onthe/9.jpg" alt="On the concrete 9">
+          <img src="images/photo/onthe/9.webp" loading="lazy" alt="On the concrete 9">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="on-concrete">
-          <img src="images/photo/onthe/10.jpg" alt="On the concrete 10">
+          <img src="images/photo/onthe/10.webp" loading="lazy" alt="On the concrete 10">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="on-concrete">
-          <img src="images/photo/onthe/11.jpg" alt="On the concrete 11">
+          <img src="images/photo/onthe/11.webp" loading="lazy" alt="On the concrete 11">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="on-concrete">
-          <img src="images/photo/onthe/12.jpg" alt="On the concrete 12">
+          <img src="images/photo/onthe/12.webp" loading="lazy" alt="On the concrete 12">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="on-concrete">
-          <img src="images/photo/onthe/13.jpg" alt="On the concrete 13">
+          <img src="images/photo/onthe/13.webp" loading="lazy" alt="On the concrete 13">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="on-concrete">
-          <img src="images/photo/onthe/14.jpg" alt="On the concrete 14">
+          <img src="images/photo/onthe/14.webp" loading="lazy" alt="On the concrete 14">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="on-concrete">
-          <img src="images/photo/onthe/15.jpg" alt="On the concrete 15">
+          <img src="images/photo/onthe/15.webp" loading="lazy" alt="On the concrete 15">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="on-concrete">
-          <img src="images/photo/onthe/16.jpg" alt="On the concrete 16">
+          <img src="images/photo/onthe/16.webp" loading="lazy" alt="On the concrete 16">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="on-concrete">
-          <img src="images/photo/onthe/17.jpg" alt="On the concrete 17">
+          <img src="images/photo/onthe/17.webp" loading="lazy" alt="On the concrete 17">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
-          <img src="images/photo/between/1.jpg" alt="Between dreams 1">
+          <img src="images/photo/between/1.webp" loading="lazy" alt="Between dreams 1">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
-          <img src="images/photo/between/2.jpg" alt="Between dreams 2">
+          <img src="images/photo/between/2.webp" loading="lazy" alt="Between dreams 2">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
-          <img src="images/photo/between/3.jpg" alt="Between dreams 3">
+          <img src="images/photo/between/3.webp" loading="lazy" alt="Between dreams 3">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
-          <img src="images/photo/between/4.jpg" alt="Between dreams 4">
+          <img src="images/photo/between/4.webp" loading="lazy" alt="Between dreams 4">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
-          <img src="images/photo/between/5.jpg" alt="Between dreams 5">
+          <img src="images/photo/between/5.webp" loading="lazy" alt="Between dreams 5">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
-          <img src="images/photo/between/6.jpg" alt="Between dreams 6">
+          <img src="images/photo/between/6.webp" loading="lazy" alt="Between dreams 6">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
-          <img src="images/photo/between/7.jpg" alt="Between dreams 7">
+          <img src="images/photo/between/7.webp" loading="lazy" alt="Between dreams 7">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
-          <img src="images/photo/between/8.jpg" alt="Between dreams 8">
+          <img src="images/photo/between/8.webp" loading="lazy" alt="Between dreams 8">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
-          <img src="images/photo/between/9.jpg" alt="Between dreams 9">
+          <img src="images/photo/between/9.webp" loading="lazy" alt="Between dreams 9">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
-          <img src="images/photo/between/10.jpg" alt="Between dreams 10">
+          <img src="images/photo/between/10.webp" loading="lazy" alt="Between dreams 10">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
-          <img src="images/photo/between/11.jpg" alt="Between dreams 11">
+          <img src="images/photo/between/11.webp" loading="lazy" alt="Between dreams 11">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
-          <img src="images/photo/between/12.jpg" alt="Between dreams 12">
+          <img src="images/photo/between/12.webp" loading="lazy" alt="Between dreams 12">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
-          <img src="images/photo/between/13.jpg" alt="Between dreams 13">
+          <img src="images/photo/between/13.webp" loading="lazy" alt="Between dreams 13">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
-          <img src="images/photo/between/14.jpg" alt="Between dreams 14">
+          <img src="images/photo/between/14.webp" loading="lazy" alt="Between dreams 14">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
-          <img src="images/photo/between/15.jpg" alt="Between dreams 15">
+          <img src="images/photo/between/15.webp" loading="lazy" alt="Between dreams 15">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
-          <img src="images/photo/between/16.jpg" alt="Between dreams 16">
+          <img src="images/photo/between/16.webp" loading="lazy" alt="Between dreams 16">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
-          <img src="images/photo/between/17.jpg" alt="Between dreams 17">
+          <img src="images/photo/between/17.webp" loading="lazy" alt="Between dreams 17">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
-          <img src="images/photo/between/18.jpg" alt="Between dreams 18">
+          <img src="images/photo/between/18.webp" loading="lazy" alt="Between dreams 18">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
-          <img src="images/photo/between/19.jpg" alt="Between dreams 19">
+          <img src="images/photo/between/19.webp" loading="lazy" alt="Between dreams 19">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
-          <img src="images/photo/between/20.jpg" alt="Between dreams 20">
+          <img src="images/photo/between/20.webp" loading="lazy" alt="Between dreams 20">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
-          <img src="images/photo/between/21.jpg" alt="Between dreams 21">
+          <img src="images/photo/between/21.webp" loading="lazy" alt="Between dreams 21">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
-          <img src="images/photo/between/22.jpg" alt="Between dreams 22">
+          <img src="images/photo/between/22.webp" loading="lazy" alt="Between dreams 22">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
-          <img src="images/photo/between/23.jpg" alt="Between dreams 23">
+          <img src="images/photo/between/23.webp" loading="lazy" alt="Between dreams 23">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
-          <img src="images/photo/between/24.jpg" alt="Between dreams 24">
+          <img src="images/photo/between/24.webp" loading="lazy" alt="Between dreams 24">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
-          <img src="images/photo/between/25.jpg" alt="Between dreams 25">
+          <img src="images/photo/between/25.webp" loading="lazy" alt="Between dreams 25">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
-          <img src="images/photo/between/26.jpg" alt="Between dreams 26">
+          <img src="images/photo/between/26.webp" loading="lazy" alt="Between dreams 26">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
-          <img src="images/photo/between/27.jpg" alt="Between dreams 27">
+          <img src="images/photo/between/27.webp" loading="lazy" alt="Between dreams 27">
         </div>
         <div class="grid-item principal-item" data-type="principal" data-collection="between-dreams">
-          <img src="images/photo/between/28.jpg" alt="Between dreams 28">
+          <img src="images/photo/between/28.webp" loading="lazy" alt="Between dreams 28">
         </div>
         <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="fisheye">
-          <img src="images/photo/analogue/fisheye/1.jpg" alt="Fisheye 1">
+          <img src="images/photo/analogue/fisheye/1.webp" loading="lazy" alt="Fisheye 1">
         </div>
         <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="fisheye">
-          <img src="images/photo/analogue/fisheye/2.jpg" alt="Fisheye 2">
+          <img src="images/photo/analogue/fisheye/2.webp" loading="lazy" alt="Fisheye 2">
         </div>
         <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="fisheye">
-          <img src="images/photo/analogue/fisheye/3.jpg" alt="Fisheye 3">
+          <img src="images/photo/analogue/fisheye/3.webp" loading="lazy" alt="Fisheye 3">
         </div>
         <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="fisheye">
-          <img src="images/photo/analogue/fisheye/4.jpg" alt="Fisheye 4">
+          <img src="images/photo/analogue/fisheye/4.webp" loading="lazy" alt="Fisheye 4">
         </div>
         <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="fisheye">
-          <img src="images/photo/analogue/fisheye/5.jpg" alt="Fisheye 5">
+          <img src="images/photo/analogue/fisheye/5.webp" loading="lazy" alt="Fisheye 5">
         </div>
         <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="fisheye">
-          <img src="images/photo/analogue/fisheye/6.jpg" alt="Fisheye 6">
+          <img src="images/photo/analogue/fisheye/6.webp" loading="lazy" alt="Fisheye 6">
         </div>
         <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="fisheye">
-          <img src="images/photo/analogue/fisheye/7.jpg" alt="Fisheye 7">
+          <img src="images/photo/analogue/fisheye/7.webp" loading="lazy" alt="Fisheye 7">
         </div>
         <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="fisheye">
-          <img src="images/photo/analogue/fisheye/8.jpg" alt="Fisheye 8">
+          <img src="images/photo/analogue/fisheye/8.webp" loading="lazy" alt="Fisheye 8">
         </div>
         <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="fisheye">
-          <img src="images/photo/analogue/fisheye/9.jpg" alt="Fisheye 9">
+          <img src="images/photo/analogue/fisheye/9.webp" loading="lazy" alt="Fisheye 9">
         </div>
         <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
-          <img src="images/photo/analogue/110mm/1.jpg" alt="110mm 1">
+          <img src="images/photo/analogue/110mm/1.webp" loading="lazy" alt="110mm 1">
         </div>
         <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
-          <img src="images/photo/analogue/110mm/2.jpg" alt="110mm 2">
+          <img src="images/photo/analogue/110mm/2.webp" loading="lazy" alt="110mm 2">
         </div>
         <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
-          <img src="images/photo/analogue/110mm/3.jpg" alt="110mm 3">
+          <img src="images/photo/analogue/110mm/3.webp" loading="lazy" alt="110mm 3">
         </div>
         <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
-          <img src="images/photo/analogue/110mm/4.jpg" alt="110mm 4">
+          <img src="images/photo/analogue/110mm/4.webp" loading="lazy" alt="110mm 4">
         </div>
         <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
-          <img src="images/photo/analogue/110mm/5.jpg" alt="110mm 5">
+          <img src="images/photo/analogue/110mm/5.webp" loading="lazy" alt="110mm 5">
         </div>
         <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
-          <img src="images/photo/analogue/110mm/6.jpg" alt="110mm 6">
+          <img src="images/photo/analogue/110mm/6.webp" loading="lazy" alt="110mm 6">
         </div>
         <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
-          <img src="images/photo/analogue/110mm/7.jpg" alt="110mm 7">
+          <img src="images/photo/analogue/110mm/7.webp" loading="lazy" alt="110mm 7">
         </div>
         <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
-          <img src="images/photo/analogue/110mm/8.jpg" alt="110mm 8">
+          <img src="images/photo/analogue/110mm/8.webp" loading="lazy" alt="110mm 8">
         </div>
         <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
-          <img src="images/photo/analogue/110mm/9.jpg" alt="110mm 9">
+          <img src="images/photo/analogue/110mm/9.webp" loading="lazy" alt="110mm 9">
         </div>
         <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
-          <img src="images/photo/analogue/110mm/10.jpg" alt="110mm 10">
+          <img src="images/photo/analogue/110mm/10.webp" loading="lazy" alt="110mm 10">
         </div>
         <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
-          <img src="images/photo/analogue/110mm/11.jpg" alt="110mm 11">
+          <img src="images/photo/analogue/110mm/11.webp" loading="lazy" alt="110mm 11">
         </div>
         <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
-          <img src="images/photo/analogue/110mm/12.jpg" alt="110mm 12">
+          <img src="images/photo/analogue/110mm/12.webp" loading="lazy" alt="110mm 12">
         </div>
         <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
-          <img src="images/photo/analogue/110mm/13.jpg" alt="110mm 13">
+          <img src="images/photo/analogue/110mm/13.webp" loading="lazy" alt="110mm 13">
         </div>
         <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
-          <img src="images/photo/analogue/110mm/14.jpg" alt="110mm 14">
+          <img src="images/photo/analogue/110mm/14.webp" loading="lazy" alt="110mm 14">
         </div>
         <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
-          <img src="images/photo/analogue/110mm/15.jpg" alt="110mm 15">
+          <img src="images/photo/analogue/110mm/15.webp" loading="lazy" alt="110mm 15">
         </div>
         <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
-          <img src="images/photo/analogue/110mm/16.jpg" alt="110mm 16">
+          <img src="images/photo/analogue/110mm/16.webp" loading="lazy" alt="110mm 16">
         </div>
         <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
-          <img src="images/photo/analogue/110mm/17.jpg" alt="110mm 17">
+          <img src="images/photo/analogue/110mm/17.webp" loading="lazy" alt="110mm 17">
         </div>
         <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
-          <img src="images/photo/analogue/110mm/18.jpg" alt="110mm 18">
+          <img src="images/photo/analogue/110mm/18.webp" loading="lazy" alt="110mm 18">
         </div>
         <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="110mm">
-          <img src="images/photo/analogue/110mm/19.jpg" alt="110mm 19">
+          <img src="images/photo/analogue/110mm/19.webp" loading="lazy" alt="110mm 19">
         </div>
         <div class="grid-item analogue-item hidden" data-type="analogue" data-collection="3d">
           <video autoplay loop muted playsinline>
@@ -932,22 +932,19 @@
         
         const grid = document.querySelector('.masonry-gallery-container');
         
-        // Modificado: Inicialización más robusta de Masonry
         const msnry = new Masonry( grid, {
-            itemSelector: '.grid-item:not(.hidden)', // Solo elementos no ocultos
-            columnWidth: '.grid-sizer', // Usar sizer estático
+            itemSelector: '.grid-item:not(.hidden)',
+            columnWidth: '.grid-sizer',
             percentPosition: true,
             gutter: 10,
             horizontalOrder: true,
             transitionDuration: '0.2s'
         });
 
-        // Recalcular layout cuando carguen las imágenes
         imagesLoaded( grid ).on( 'progress', function() {
           msnry.layout();
         });
         
-        // Recalcular con videos
         const videos = grid.querySelectorAll('video');
         videos.forEach(vid => {
             vid.addEventListener('loadeddata', function() {
@@ -1010,7 +1007,6 @@
             });
         });
 
-        // Modificado: Lógica de filtrado mejorada
         function filterGallery(msnry, type, collection) {
             const allItems = document.querySelectorAll('.grid-item');
             
@@ -1034,11 +1030,9 @@
                 }
             });
 
-            // Forzar recálculo del layout y decirle a Masonry que vuelva a buscar los elementos
             msnry.reloadItems(); 
             msnry.layout();
             
-            // Pequeño timeout por si las imágenes/videos de la nueva sección aún no han renderizado su altura
             setTimeout(() => {
                 msnry.layout();
             }, 100);
@@ -1064,8 +1058,6 @@
           });
         });
 
-        // Inicialización
-        // Primero, nos aseguramos de que todos los analógicos estén ocultos por defecto
         document.querySelectorAll('.analogue-item').forEach(el => el.classList.add('hidden'));
         filterGallery(msnry, 'principal', 'all');
 
