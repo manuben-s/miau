@@ -650,7 +650,7 @@
       pageIndicator.textContent = `Plates ${firstNum} – ${secondNum}`;
     }
 
- function turnPage(direction) {
+function turnPage(direction) {
       if (isAnimating) return;
       const targetSpread = currentSpread + direction;
       if (targetSpread < 0 || targetSpread >= totalSpreads) return;
@@ -667,15 +667,18 @@
 
         flipLeaf.className = 'flip-leaf flipping-next';
 
-        // Ocultar inmediatamente la página derecha de origen para evitar duplicados en el fondo
+        // 1. Ocultar inmediatamente la página que empieza a girar
         currentSpreadEl.querySelector('.page-right').style.visibility = 'hidden';
-        
-        // Hacer visible el pliego de destino debajo antes de que termine el giro
-        nextSpreadEl.classList.add('active');
 
+        // 2. Revelar la página destino exactamente a la mitad del giro (375ms, cuando la hoja tapa el centro)
+        setTimeout(() => {
+          nextSpreadEl.classList.add('active');
+        }, 375);
+
+        // 3. Finalizar la animación
         setTimeout(() => {
           currentSpreadEl.classList.remove('active');
-          currentSpreadEl.querySelector('.page-right').style.visibility = ''; // Restaurar visibilidad
+          currentSpreadEl.querySelector('.page-right').style.visibility = ''; // Restaurar
           currentSpread = targetSpread;
           flipLeaf.className = 'flip-leaf';
           updateButtons();
@@ -689,15 +692,18 @@
 
         flipLeaf.className = 'flip-leaf flipping-prev';
 
-        // Ocultar inmediatamente la página izquierda de origen
+        // 1. Ocultar inmediatamente la página que empieza a girar
         currentSpreadEl.querySelector('.page-left').style.visibility = 'hidden';
 
-        // Hacer visible el pliego de destino debajo antes de que termine el giro
-        nextSpreadEl.classList.add('active');
+        // 2. Revelar la página destino a la mitad del giro
+        setTimeout(() => {
+          nextSpreadEl.classList.add('active');
+        }, 375);
 
+        // 3. Finalizar la animación
         setTimeout(() => {
           currentSpreadEl.classList.remove('active');
-          currentSpreadEl.querySelector('.page-left').style.visibility = ''; // Restaurar visibilidad
+          currentSpreadEl.querySelector('.page-left').style.visibility = ''; // Restaurar
           currentSpread = targetSpread;
           flipLeaf.className = 'flip-leaf';
           updateButtons();
