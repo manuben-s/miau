@@ -66,9 +66,18 @@
     /* --- STATEMENT SECTION --- */
     .statement-section { max-width: 1000px; margin: 4rem auto 4rem; padding: 0 2rem; }
     .statement-content { font-size: 1.15rem; color: var(--ink-dark); line-height: 1.7; }
-    .statement-content p { margin-bottom: 1.2rem; }
+    .statement-content p {
+      text-align: justify;
+      text-justify: inter-word; /* Distribución uniforme entre palabras */
+      hyphens: auto;           /* Divide palabras largas con guión para mejor flujo */
+    }
+
+    .statement-content .statement-signoff {
+      text-align: right; /* O 'center' / 'right' */
+    }
+
     .statement-content .intro { font-size: 1.5rem; font-weight: 400; margin-bottom: 1.5rem; line-height: 1.4; color: var(--ink-muted); }
-    .statement-signoff { margin-top: 2rem; font-style: italic; font-size: 1.3rem; }
+
 
     /* --- PRODUCTS GRID --- */
     .products-section { max-width: 1200px; margin: 0 auto 8rem; padding: 0 2rem; }
@@ -252,6 +261,8 @@
     </nav>
   </header>
 
+
+  
   <!-- STATEMENT -->
   <section class="statement-section">
     <div class="statement-content">

@@ -41,10 +41,11 @@
     /* --- TOP NAVIGATION --- */
 
 
+/* --- TOP NAVIGATION (Igual a About) --- */
     header {
-      background: #0d0c0b;
-      border-bottom: 1px solid #24211d;
-      padding: 1.1rem 2.5rem;
+      background: #060709;
+      border-bottom: 1px solid #1a1e26;
+      padding: 1.5rem 3rem; /* Cambiado de 1.1rem 2.5rem a 1.5rem 3rem */
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -55,9 +56,15 @@
       z-index: 50;
     }
 
+    nav ul { 
+      display: flex; 
+      list-style: none; 
+      gap: 2.5rem; /* Cambiado de 2rem a 2.5rem */
+    }
+
     .brand { color: var(--ink-white); font-weight: 500; letter-spacing: 0.18em; }
 
-    nav ul { display: flex; list-style: none; gap: 2rem; }
+
     nav a { color: var(--ink-muted); text-decoration: none; transition: color 0.25s ease; }
     nav a:hover, nav a.active { color: var(--ink-white); }
 
@@ -257,6 +264,8 @@
     </ul>
   </nav>
 </header>
+
+
 
 
 
