@@ -667,9 +667,15 @@
 
         flipLeaf.className = 'flip-leaf flipping-next';
 
+        // Ocultar inmediatamente la página derecha de origen para evitar duplicados en el fondo
+        currentSpreadEl.querySelector('.page-right').style.visibility = 'hidden';
+        
+        // Hacer visible el pliego de destino debajo antes de que termine el giro
+        nextSpreadEl.classList.add('active');
+
         setTimeout(() => {
           currentSpreadEl.classList.remove('active');
-          nextSpreadEl.classList.add('active');
+          currentSpreadEl.querySelector('.page-right').style.visibility = ''; // Restaurar visibilidad
           currentSpread = targetSpread;
           flipLeaf.className = 'flip-leaf';
           updateButtons();
@@ -683,9 +689,15 @@
 
         flipLeaf.className = 'flip-leaf flipping-prev';
 
+        // Ocultar inmediatamente la página izquierda de origen
+        currentSpreadEl.querySelector('.page-left').style.visibility = 'hidden';
+
+        // Hacer visible el pliego de destino debajo antes de que termine el giro
+        nextSpreadEl.classList.add('active');
+
         setTimeout(() => {
           currentSpreadEl.classList.remove('active');
-          nextSpreadEl.classList.add('active');
+          currentSpreadEl.querySelector('.page-left').style.visibility = ''; // Restaurar visibilidad
           currentSpread = targetSpread;
           flipLeaf.className = 'flip-leaf';
           updateButtons();
@@ -693,7 +705,6 @@
         }, 750);
       }
     }
-
     /* --- LIGHTBOX FUNCTIONS --- */
     function openLightbox(src, captionText) {
       lightboxImg.src = src;
