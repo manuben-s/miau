@@ -650,7 +650,7 @@
       pageIndicator.textContent = `Plates ${firstNum} – ${secondNum}`;
     }
 
-    function turnPage(direction) {
+ function turnPage(direction) {
       if (isAnimating) return;
       const targetSpread = currentSpread + direction;
       if (targetSpread < 0 || targetSpread >= totalSpreads) return;
@@ -661,6 +661,7 @@
       const nextSpreadEl = spreads[targetSpread];
 
       if (direction === 1) {
+        // Avanzar página
         leafFront.innerHTML = currentSpreadEl.querySelector('.page-right').innerHTML;
         leafBack.innerHTML = nextSpreadEl.querySelector('.page-left').innerHTML;
 
@@ -676,6 +677,7 @@
         }, 750);
 
       } else {
+        // Retroceder página
         leafFront.innerHTML = currentSpreadEl.querySelector('.page-left').innerHTML;
         leafBack.innerHTML = nextSpreadEl.querySelector('.page-right').innerHTML;
 
