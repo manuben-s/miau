@@ -807,6 +807,21 @@
     const lightboxVideo = document.getElementById('lightboxVideo');
     const lightboxCaption = document.getElementById('lightboxCaption');
 
+    // Inicializar atributos de seguridad en los videos fijos
+    [heroVideo, lightboxVideo].forEach(vid => {
+      if (vid) {
+        vid.setAttribute('controlsList', 'nodownload');
+        vid.setAttribute('disablePictureInPicture', true);
+      }
+    });
+
+    // Función auxiliar para bloquear el arrastre en imágenes y videos
+    function protectMediaElements() {
+      document.querySelectorAll('img, video').forEach(el => {
+        el.addEventListener('dragstart', (event) => event.preventDefault());
+      });
+    }
+
     function switchCollection(index) {
       currentCollectionIdx = index;
       currentItemIdx = 0;
@@ -850,6 +865,9 @@
         thumb.appendChild(tag);
         filmstrip.appendChild(thumb);
       });
+
+      // Proteger las nuevas miniaturas inyectadas
+      protectMediaElements();
     }
 
     function loadItem(index) {
@@ -884,6 +902,7 @@
         heroTitle.textContent = item.title;
         heroMeta.textContent = item.year;
         heroArea.classList.remove('loading');
+        protectMediaElements();
       }, 150);
     }
 
@@ -902,6 +921,7 @@
 
       lightboxCaption.innerHTML = `${item.title} <span>${item.year}</span>`;
       lightbox.classList.add('active');
+      protectMediaElements();
     }
 
     function closeLightbox(e) {
@@ -915,6 +935,12 @@
         lightboxVideo.src = '';
       }, 250);
     }
+
+    // Bloqueo global de clic derecho en la página para proteger recursos
+    document.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      return false;
+    });
 
     document.addEventListener('keydown', (e) => {
       if (lightbox.classList.contains('active')) {

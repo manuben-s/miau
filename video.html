@@ -620,6 +620,13 @@
     const soundBtn = document.getElementById('soundBtn');
     const playPauseBtn = document.getElementById('playPauseBtn');
 
+    // Inicializar atributos de seguridad anti-descarga en el reproductor TV
+    if (tvPlayer) {
+      tvPlayer.setAttribute('controlsList', 'nodownload');
+      tvPlayer.setAttribute('disablePictureInPicture', true);
+      tvPlayer.addEventListener('dragstart', (e) => e.preventDefault());
+    }
+
     /* --- PLAY / PAUSE FUNCTIONALITY --- */
     function togglePlayPause() {
       if (tvPlayer.paused) {
@@ -693,6 +700,12 @@
       soundBtn.style.color = tvPlayer.muted ? "#9e9587" : "#ffb58a";
       showOSD(tvPlayer.muted ? "MUTE" : "VOL ▮▮▮▯", 1200);
     }
+
+    /* --- BLOQUEO DE CLIC DERECHO --- */
+    document.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      return false;
+    });
 
     /* --- KEYBOARD SHORTCUTS --- */
     document.addEventListener('keydown', (e) => {

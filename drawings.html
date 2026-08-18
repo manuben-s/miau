@@ -632,7 +632,7 @@
     </div>
   </div>
 
-  <script>
+<script>
     let currentSpread = 0;
     let isAnimating = false;
 
@@ -657,7 +657,15 @@
       const secondNum = String(Math.min((currentSpread + 1) * 2, totalSpreads * 2)).padStart(2, '0');
       pageIndicator.textContent = `Plates ${firstNum} – ${secondNum}`;
     }
-function turnPage(direction) {
+
+    // Función auxiliar para aplicar protecciones a elementos actuales
+    function protectElements() {
+      document.querySelectorAll('.spread img, #flipLeaf img, #lightboxImg').forEach(el => {
+        el.addEventListener('dragstart', (event) => event.preventDefault());
+      });
+    }
+
+    function turnPage(direction) {
       if (isAnimating) return;
       const targetSpread = currentSpread + direction;
       if (targetSpread < 0 || targetSpread >= totalSpreads) return;
@@ -675,6 +683,9 @@ function turnPage(direction) {
         // Ocultar página derecha actual y preparar la hoja de giro
         currentSpreadEl.querySelector('.page-right').style.visibility = 'hidden';
         flipLeaf.className = 'flip-leaf flipping-next';
+
+        // Proteger elementos recién inyectados en la hoja de giro
+        protectElements();
 
         // A la mitad del giro, ocultar el spread viejo y activar el nuevo debajo
         setTimeout(() => {
@@ -699,6 +710,9 @@ function turnPage(direction) {
         currentSpreadEl.querySelector('.page-left').style.visibility = 'hidden';
         flipLeaf.className = 'flip-leaf flipping-prev';
 
+        // Proteger elementos recién inyectados en la hoja de giro
+        protectElements();
+
         setTimeout(() => {
           currentSpreadEl.classList.remove('active');
           currentSpreadEl.querySelector('.page-left').style.visibility = '';
@@ -720,6 +734,7 @@ function turnPage(direction) {
       lightboxImg.src = src;
       lightboxCaption.textContent = captionText;
       lightbox.classList.add('active');
+      protectElements();
     }
 
     function closeLightbox(e) {
@@ -731,6 +746,17 @@ function turnPage(direction) {
     function closeLightboxDirect() {
       lightbox.classList.remove('active');
     }
+
+    /* --- PROTECCIÓN ANTIDESCARGAS --- */
+    document.addEventListener('contextmenu', (event) => {
+      // Bloquea clic derecho de manera global en este visor/lightbox
+      event.preventDefault();
+      return false;
+    });
+
+    // Aplicar al cargar la página por primera vez
+    protectElements();
+
 
     /* --- KEYBOARD CONTROLS --- */
     document.addEventListener('keydown', (e) => {
@@ -744,6 +770,6 @@ function turnPage(direction) {
 
     updateButtons();
   </script>
-
+  
 </body>
 </html>

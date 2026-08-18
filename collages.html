@@ -527,6 +527,20 @@
       { x: 42, y: 28, r: 0.8 }
     ];
 
+    // Configurar seguridad en videos al cargar
+    const lightboxVideo = document.getElementById('lightboxVideo');
+    if (lightboxVideo) {
+      lightboxVideo.setAttribute('controlsList', 'nodownload');
+      lightboxVideo.setAttribute('disablePictureInPicture', true);
+    }
+
+    // Función auxiliar para bloquear el arrastre nativo de imágenes/videos dentro de los scraps
+    function protectScrapMedia() {
+      document.querySelectorAll('.scrap-item img, .scrap-item video, #lightboxImg').forEach(el => {
+        el.addEventListener('dragstart', (e) => e.preventDefault());
+      });
+    }
+
     function tidyDesk() {
       scraps.forEach((item, index) => {
         const pos = defaultPositions[index] || { x: 20, y: 20, r: 0 };
@@ -536,6 +550,7 @@
         item.style.zIndex = index + 1;
       });
       highestZ = scraps.length + 2;
+      protectScrapMedia();
     }
 
     function scatterScraps() {
@@ -547,6 +562,7 @@
         item.style.top = `${ry}%`;
         item.style.transform = `rotate(${rot}deg)`;
       });
+      protectScrapMedia();
     }
 
     // --- DRAG & DROP WITH TOUCH / POINTER ENGINE ---
@@ -604,7 +620,6 @@
     // --- LIGHTBOX CONTROLS ---
     const lightbox = document.getElementById('lightbox');
     const lightboxImg = document.getElementById('lightboxImg');
-    const lightboxVideo = document.getElementById('lightboxVideo');
     const lightboxCaption = document.getElementById('lightboxCaption');
 
     function openLightbox(src, title, meta, isVideo) {
@@ -612,13 +627,16 @@
         lightboxImg.style.display = 'none';
         lightboxVideo.style.display = 'block';
         lightboxVideo.src = src;
+        lightboxVideo.play();
       } else {
+        lightboxVideo.pause();
         lightboxVideo.style.display = 'none';
         lightboxImg.style.display = 'block';
         lightboxImg.src = src;
       }
       lightboxCaption.innerHTML = `${title} <span>${meta}</span>`;
       lightbox.classList.add('active');
+      protectScrapMedia();
     }
 
     function closeLightbox(e) {
@@ -627,11 +645,18 @@
 
     function closeLightboxDirect() {
       lightbox.classList.remove('active');
+      if (lightboxVideo) lightboxVideo.pause();
       setTimeout(() => {
         lightboxImg.src = '';
         lightboxVideo.src = '';
       }, 300);
     }
+
+    // Bloqueo global de clic derecho para evitar inspección directa de menús contextuales en el escritorio de recortes
+    document.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+      return false;
+    });
 
     document.addEventListener('keydown', (e) => {
       if (e.key === 'Escape' && lightbox.classList.contains('active')) {

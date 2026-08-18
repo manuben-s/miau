@@ -947,6 +947,10 @@
         
         const videos = grid.querySelectorAll('video');
         videos.forEach(vid => {
+            // Protección nativa en los videos de la grid
+            vid.setAttribute('controlsList', 'nodownload');
+            vid.setAttribute('disablePictureInPicture', true);
+
             vid.addEventListener('loadeddata', function() {
                 msnry.layout();
             });
@@ -971,6 +975,11 @@
                 } else if (vid) {
                     const source = vid.querySelector('source');
                     modalVid.src = source ? source.src : vid.src;
+                    
+                    // Asegurar atributos anti-descarga en el video del modal
+                    modalVid.setAttribute('controlsList', 'nodownload');
+                    modalVid.setAttribute('disablePictureInPicture', true);
+
                     modalVid.style.display = 'block';
                     modalImg.style.display = 'none';
                     modalVid.play();
@@ -996,16 +1005,31 @@
             }
         });
 
+        // ==========================================
+        // CAPAS DE PROTECCIÓN CONTRA DESCARGAS
+        // ==========================================
+
+        // 1. Bloquear clic derecho en toda la galería y en el modal
         grid.addEventListener('contextmenu', function(event) {
             event.preventDefault();
             return false;
         });
-
-        grid.querySelectorAll('img, video').forEach(el => {
-            el.addEventListener('dragstart', function(event) {
-                event.preventDefault();
-            });
+        modal.addEventListener('contextmenu', function(event) {
+            event.preventDefault();
+            return false;
         });
+
+        // 2. Bloquear arrastre de imágenes y videos (Grid y Modal)
+        const protectElements = () => {
+            document.querySelectorAll('.grid-item img, .grid-item video, #modalImage, #modalVideo').forEach(el => {
+                el.addEventListener('dragstart', function(event) {
+                    event.preventDefault();
+                });
+            });
+        };
+        protectElements();
+
+        // ==========================================
 
         function filterGallery(msnry, type, collection) {
             const allItems = document.querySelectorAll('.grid-item');
@@ -1035,6 +1059,7 @@
             
             setTimeout(() => {
                 msnry.layout();
+                protectElements(); // Re-aplicar protecciones si fuera necesario tras filtrar
             }, 100);
         }
 
@@ -1062,6 +1087,6 @@
         filterGallery(msnry, 'principal', 'all');
 
     });
-  </script>
+</script>
 </body>
 </html>
