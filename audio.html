@@ -241,33 +241,53 @@
   
 
   <!-- HEADER -->
-<header>
-  <div class="brand">Paloma</div>
-  <nav>
-    <ul>
-      <li><a href="index.html">Home</a></li>
+/* --- NAVEGACIÓN --- */
+    header {
+      background: transparent;
+      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
+      padding: 1.5rem 3rem;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      font-family: var(--font-mono);
+      font-size: 0.75rem;
+      letter-spacing: 0.12em;
+      text-transform: uppercase;
+      z-index: 50;
+    }
 
-      <li class="dropdown">
-        <a href="visual.html">Visual</a>
-        <div class="dropdown-content">
-          <a href="photography.html">Photography</a>
-          <a href="illustration.html">Illustration</a>
-          <a href="drawings.html">Drawings</a>
-          <a href="collages.html">Collages</a>
-          <a href="video.html">Video</a>
-        </div>
-      </li>
+    .brand {
+      color: var(--ink-white);
+      font-weight: 500;
+      letter-spacing: 0.18em;
+    }
 
-      <li><a href="audio.html" class="active">Audio</a></li>
-      <li><a href="about.html">About</a></li>
-      <li><a href="products.html">Products</a></li>
-    </ul>
-  </nav>
-</header>
+    nav ul {
+      display: flex;
+      list-style: none;
+      gap: 2.5rem;
+    }
 
+    nav a {
+      color: var(--ink-muted);
+      text-decoration: none;
+      transition: color 0.3s ease;
+      position: relative;
+    }
 
+    nav a:hover, nav a.active {
+      color: var(--ink-white);
+    }
 
-
+    nav a.active::after {
+      content: "";
+      position: absolute;
+      bottom: -6px;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: var(--ink-white);
+    }
 
   <!-- MAIN WORKSPACE -->
   <main>
