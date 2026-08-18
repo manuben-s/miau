@@ -38,14 +38,22 @@
       user-select: none;
     }
 
+    /* --- PROTECCIÓN PARA IMÁGENES Y VIDEOS --- */
+    img, video {
+      -webkit-user-select: none;
+      -khtml-user-select: none;
+      -moz-user-select: none;
+      -o-user-select: none;
+      user-select: none;
+      -webkit-user-drag: none;
+      pointer-events: none;
+    }
+
     /* --- TOP NAVIGATION --- */
-
-
-/* --- TOP NAVIGATION (Igual a About) --- */
     header {
       background: #060709;
       border-bottom: 1px solid #1a1e26;
-      padding: 1.5rem 3rem; /* Cambiado de 1.1rem 2.5rem a 1.5rem 3rem */
+      padding: 1.5rem 3rem;
       display: flex;
       justify-content: space-between;
       align-items: center;
@@ -56,17 +64,36 @@
       z-index: 50;
     }
 
+    .brand { 
+      color: var(--ink-white); 
+      font-weight: 500; 
+      letter-spacing: 0.18em; 
+    }
+
     nav ul { 
       display: flex; 
       list-style: none; 
-      gap: 2.5rem; /* Cambiado de 2rem a 2.5rem */
+      gap: 2.5rem; 
     }
 
-    .brand { color: var(--ink-white); font-weight: 500; letter-spacing: 0.18em; }
-
-
-    nav a { color: var(--ink-muted); text-decoration: none; transition: color 0.25s ease; }
+    nav a { 
+      color: var(--ink-muted); 
+      text-decoration: none; 
+      transition: color 0.3s ease; 
+      position: relative;
+    }
+    
     nav a:hover, nav a.active { color: var(--ink-white); }
+
+    nav a.active::after {
+      content: "";
+      position: absolute;
+      bottom: -6px;
+      left: 0;
+      width: 100%;
+      height: 1px;
+      background: var(--ink-white);
+    }
 
     /* --- MAIN WORKSPACE --- */
     main { flex: 1; display: flex; overflow: hidden; position: relative; }
@@ -77,7 +104,7 @@
       gap: 2.2rem;
       padding: 1.8rem 2.5rem;
       background: radial-gradient(circle at 35% 40%, rgba(43, 92, 143, 0.08) 0%, rgba(217, 90, 43, 0.04) 40%, transparent 75%), #0c0e12;
-      overflow-y: auto; /* Allow scrolling inside the workspace */
+      overflow-y: auto;
     }
 
     /* --- LEFT SIDE: TURNTABLE & CUSTOM IMAGE --- */
@@ -100,13 +127,11 @@
       box-shadow: 0 25px 50px rgba(0,0,0,0.75), inset 0 2px 6px rgba(255,255,255,0.04);
     }
 
-   
     .platter-area { width: 250px; height: 250px; background: #080a0e; border-radius: 50%; position: relative; box-shadow: inset 0 0 18px rgba(0,0,0,0.95), 0 5px 15px rgba(0,0,0,0.6); display: flex; align-items: center; justify-content: center; }
     .vinyl-record { width: 242px; height: 242px; background: radial-gradient(circle, #1a1e28 0%, #11141a 38%, #080a0e 70%, #1c222d 100%); border-radius: 50%; transition: transform 0.5s ease; }
     .vinyl-record.spinning { animation: spinVinyl 3.2s linear infinite; }
     @keyframes spinVinyl { 100% { transform: rotate(360deg); } }
     .vinyl-label { position: absolute; top: 50%; left: 50%; transform: translate(-50%, -50%); width: 88px; height: 88px; background: var(--gradient-blue-orange); border-radius: 50%; display: flex; flex-direction: column; align-items: center; justify-content: center; color: #fff; font-family: var(--font-mono); font-size: 0.52rem; border: 3px solid #0b0c0e; }
-    
 
     .audio-player-dock { background: linear-gradient(135deg, #13161c 0%, #0d0f14 100%); border: 1px solid var(--panel-border); border-radius: 10px; padding: 1rem; min-height: 115px; }
     .dock-header { display: flex; justify-content: space-between; align-items: center; font-family: var(--font-mono); font-size: 0.7rem; letter-spacing: 0.12em; }
@@ -118,7 +143,7 @@
     /* Custom Image Zone */
     .custom-image-zone {
       width: 100%;
-      flex: 1; /* Esto hace que ocupe todo el espacio libre restante en la columna */
+      flex: 1;
       min-height: 150px;
       display: flex;
       align-items: center;
@@ -130,7 +155,7 @@
     .custom-image-zone img {
       width: 100%;
       height: 100%;
-      object-fit: contain; /* Para que la imagen encaje sin deformarse, flotando sobre el fondo */
+      object-fit: contain;
     }
 
     /* --- RIGHT SIDE: YOUTUBE FEATURE & UNIFIED CRATE --- */
@@ -215,6 +240,7 @@
       main { flex-direction: column; }
       .stage-container { flex-direction: column; padding: 1.5rem; }
     }
+
     /* --- MENÚ DESPLEGABLE UNIVERSAL --- */
     .dropdown { position: relative; }
     .dropdown-content {
@@ -238,56 +264,25 @@
 </head>
 <body>
 
-  
-
   <!-- HEADER -->
-/* --- NAVEGACIÓN --- */
-    header {
-      background: transparent;
-      border-bottom: 1px solid rgba(255, 255, 255, 0.05);
-      padding: 1.5rem 3rem;
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      font-family: var(--font-mono);
-      font-size: 0.75rem;
-      letter-spacing: 0.12em;
-      text-transform: uppercase;
-      z-index: 50;
-    }
-
-    .brand {
-      color: var(--ink-white);
-      font-weight: 500;
-      letter-spacing: 0.18em;
-    }
-
-    nav ul {
-      display: flex;
-      list-style: none;
-      gap: 2.5rem;
-    }
-
-    nav a {
-      color: var(--ink-muted);
-      text-decoration: none;
-      transition: color 0.3s ease;
-      position: relative;
-    }
-
-    nav a:hover, nav a.active {
-      color: var(--ink-white);
-    }
-
-    nav a.active::after {
-      content: "";
-      position: absolute;
-      bottom: -6px;
-      left: 0;
-      width: 100%;
-      height: 1px;
-      background: var(--ink-white);
-    }
+  <header>
+    <div class="brand">PALOMA</div>
+    <nav>
+      <ul>
+        <li><a href="index.html">Home</a></li>
+        <li><a href="about.html">About</a></li>
+        <li><a href="audio.html" class="active">Audio</a></li>
+        <li class="dropdown">
+          <a href="#">Work</a>
+          <div class="dropdown-content">
+            <a href="editorial.html">Editorial</a>
+            <a href="branding.html">Branding</a>
+            <a href="digital.html">Digital</a>
+          </div>
+        </li>
+      </ul>
+    </nav>
+  </header>
 
   <!-- MAIN WORKSPACE -->
   <main>
@@ -302,33 +297,38 @@
               <div class="vinyl-label"><span>miau!</span></div>
             </div>
           </div>
-       
         </div>
 
         <div class="audio-player-dock">
-          <div class="dock-header"><span class="dock-title" id="dockTrackTitle">miau!</span><span class="dock-brand">SOUNDCLOUD AUDIO</span></div>
+          <div class="dock-header">
+            <span class="dock-title" id="dockTrackTitle">miau!</span>
+            <span class="dock-brand">SOUNDCLOUD AUDIO</span>
+          </div>
           <div class="soundcloud-iframe-wrap" id="scEmbedContainer">
             <iframe src="https://w.soundcloud.com/player/?url=https%3A//soundcloud.com/ix_suona/backtocompass?si=2ab1b55c403a4c7bb3e5c2cb42c6e901&utm_source=clipboard&utm_medium=text&utm_campaign=social_sharing"></iframe>
           </div>
         </div>
 
-        <!-- NEW: Floating Image Zone -->
+        <!-- Floating Image Zone -->
         <div class="custom-image-zone">
             <img src="images/audio_fondo.webp" alt="Custom Graphic">
         </div>
 
-      </div> <!-- Cierre correcto del div deck-section -->
+      </div>
 
       <!-- RIGHT: YOUTUBE FEATURE & UNIFIED CRATE -->
       <div class="video-section">
         <div class="youtube-main-box">
-          <iframe class="youtube-player-embed" id="mainVideoEmbed" src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="DJ Set Live" frameborder="0" allowfullscreen></iframe>
-          <div class="youtube-info-bar"><span class="yt-title" id="ytMainTitle"> miau! b2b _xandrio @TheCampOutFestival 2026 </span><span class="yt-badge">YOUTUBE STREAM</span></div>
+          <iframe class="youtube-player-embed" id="mainVideoEmbed" src="https://www.youtube.com/embed/dQw4w9WgXcQ" title="DJ Set Live" allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture" allowfullscreen></iframe>
+          <div class="youtube-info-bar">
+            <span class="yt-title" id="ytMainTitle">miau! b2b _xandrio @TheCampOutFestival 2026</span>
+            <span class="yt-badge">YOUTUBE STREAM</span>
+          </div>
         </div>
 
         <!-- Unified Track / Set Crate List -->
         <div class="crate-container" id="crateContainer">
-          <!-- Items will be populated by JS -->
+          <!-- Items populated by JS -->
         </div>
       </div>
 
@@ -379,6 +379,17 @@
     }
 
     renderCrate();
+
+    // BLOQUEO DE CLIC DERECHO Y ARRASTRE PARA PROTEGER CONTENIDO
+    document.addEventListener('contextmenu', (e) => {
+      e.preventDefault();
+    });
+
+    document.addEventListener('dragstart', (e) => {
+      if (e.target.tagName === 'IMG' || e.target.tagName === 'VIDEO') {
+        e.preventDefault();
+      }
+    });
   </script>
 </body>
 </html>
