@@ -9,12 +9,40 @@
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Cormorant+Garamond:ital,wght@0,300;0,400;0,600;1,400&family=IBM+Plex+Mono:wght@300;400;500;600&display=swap" rel="stylesheet">
 
+  <style>
+    :root {
+      --bg-studio: #11100e;            /* Dark studio background */
+      --panel-bg: #171512;             /* Sidebar panel */
+      --panel-border: #26221d;
+      --canvas-base: #f3efe6;          /* Raw textured paper / canvas */
+      --rust: #d95a2b;                 /* Terracotta accent */
+      --ink-dark: #1b1916;             /* Ink on canvas */
+      --ink-muted-dark: #7d7568;
+      --ink-white: #f5f0e6;
+      --ink-muted: #857e72;
+      --font-serif: 'Cormorant Garamond', Georgia, serif;
+      --font-mono: 'IBM Plex Mono', monospace;
+    }
 
+    * {
+      box-sizing: border-box;
+      margin: 0;
+      padding: 0;
+    }
 
-</head>
-<body>
+    body {
+      background-color: var(--bg-studio);
+      color: var(--ink-white);
+      font-family: var(--font-serif);
+      height: 100vh;
+      display: flex;
+      flex-direction: column;
+      -webkit-font-smoothing: antialiased;
+      overflow: hidden;
+      user-select: none;
+    }
 
-  /* --- TOP NAVIGATION --- */
+/* --- TOP NAVIGATION --- */
  
     header {
       background: transparent;
@@ -63,6 +91,504 @@
       background: var(--ink-white);
     }
 
+    /* --- MAIN WORKSPACE --- */
+    main {
+      flex: 1;
+      display: flex;
+      overflow: hidden;
+      position: relative;
+    }
+
+    /* --- LEFT PANEL: COLLECTIONS --- */
+    aside.collections-panel {
+      width: 300px;
+      background: var(--panel-bg);
+      border-right: 1px solid var(--panel-border);
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 2rem 1.6rem;
+      z-index: 30;
+      box-shadow: 10px 0 30px rgba(0, 0, 0, 0.5);
+    }
+
+    .panel-header {
+      border-bottom: 1px solid var(--panel-border);
+      padding-bottom: 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .panel-tag {
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.2em;
+      color: var(--rust);
+      text-transform: uppercase;
+      margin-bottom: 0.3rem;
+    }
+
+    .panel-title {
+      font-family: var(--font-serif);
+      font-size: 1.6rem;
+      font-weight: 400;
+      letter-spacing: 0.02em;
+    }
+
+    .collections-list {
+      display: flex;
+      flex-direction: column;
+      gap: 1rem;
+      flex: 1;
+      overflow-y: auto;
+      scrollbar-width: none;
+    }
+
+    .collections-list::-webkit-scrollbar {
+      display: none;
+    }
+
+    .collection-card {
+      background: #1f1c17;
+      border: 1px solid var(--panel-border);
+      border-radius: 3px;
+      padding: 1.2rem;
+      cursor: pointer;
+      transition: all 0.25s cubic-bezier(0.16, 1, 0.3, 1);
+      position: relative;
+    }
+
+    .collection-card::before {
+      content: "";
+      position: absolute;
+      left: 0;
+      top: 0;
+      bottom: 0;
+      width: 3px;
+      background: transparent;
+      transition: background-color 0.25s ease;
+    }
+
+    .collection-card:hover {
+      background: #26221d;
+      border-color: #3f372d;
+      transform: translateX(4px);
+    }
+
+    .collection-card.active {
+      background: #2a251e;
+      border-color: rgba(217, 90, 43, 0.5);
+      box-shadow: 0 4px 18px rgba(0, 0, 0, 0.4);
+    }
+
+    .collection-card.active::before {
+      background: var(--rust);
+    }
+
+    .card-meta-top {
+      display: flex;
+      justify-content: space-between;
+      align-items: baseline;
+      margin-bottom: 0.3rem;
+    }
+
+    .card-series-num {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--rust);
+      letter-spacing: 0.14em;
+      font-weight: 500;
+    }
+
+    .card-count {
+      font-family: var(--font-mono);
+      font-size: 0.65rem;
+      color: var(--ink-muted);
+    }
+
+    .card-title {
+      font-family: var(--font-serif);
+      font-size: 1.45rem;
+      font-weight: 400;
+      color: var(--ink-white);
+    }
+
+    .panel-footer {
+      border-top: 1px solid var(--panel-border);
+      padding-top: 1.2rem;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      color: var(--ink-muted);
+      letter-spacing: 0.1em;
+    }
+
+    /* --- RIGHT STAGE: ORGANIC TEXTURED CANVAS --- */
+    .stage-wrapper {
+      flex: 1;
+      padding: 1.4rem 2rem 1.6rem;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .stretched-canvas {
+      width: 100%;
+      height: 100%;
+      background-color: var(--canvas-base);
+      color: var(--ink-dark);
+      border-radius: 4px;
+      position: relative;
+      display: flex;
+      flex-direction: column;
+      justify-content: space-between;
+      padding: 1.6rem 2.8rem 1.4rem;
+      box-shadow: 
+        0 25px 60px -15px rgba(0, 0, 0, 0.8),
+        0 0 0 1px rgba(0, 0, 0, 0.25),
+        inset 0 0 90px rgba(170, 145, 110, 0.28);
+      background-image: 
+        radial-gradient(circle at 15% 20%, rgba(217, 90, 43, 0.05) 0%, transparent 40%),
+        radial-gradient(circle at 80% 80%, rgba(60, 95, 135, 0.06) 0%, transparent 50%),
+        url("data:image/svg+xml,%3Csvg viewBox='0 0 400 400' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='paperNoise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='4' stitchTiles='stitch'/%3E%3CfeColorMatrix type='matrix' values='1 0 0 0 0  0 1 0 0 0  0 0 1 0 0  0 0 0 0.075 0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23paperNoise)'/%3E%3C/svg%3E");
+      overflow: hidden;
+    }
+
+    .canvas-wash {
+      position: absolute;
+      pointer-events: none;
+      filter: blur(18px);
+      opacity: 0.65;
+      mix-blend-mode: multiply;
+      transition: all 0.8s cubic-bezier(0.16, 1, 0.3, 1);
+      z-index: 1;
+    }
+
+    .wash-1 {
+      top: 2%;
+      right: 8%;
+      width: 520px;
+      height: 420px;
+      border-radius: 42% 58% 70% 30% / 45% 45% 55% 55%;
+      transform: rotate(15deg);
+    }
+
+    .wash-2 {
+      bottom: 5%;
+      left: 6%;
+      width: 560px;
+      height: 440px;
+      border-radius: 58% 42% 38% 62% / 50% 60% 40% 50%;
+      transform: rotate(-20deg);
+    }
+
+    .paint-drops {
+      position: absolute;
+      inset: 0;
+      pointer-events: none;
+      z-index: 2;
+      mix-blend-mode: multiply;
+    }
+
+    .drop {
+      position: absolute;
+      border-radius: 50%;
+      opacity: 0.75;
+      filter: blur(0.3px);
+    }
+
+    /* --- HERO DISPLAY (CON REBORDE BLANCO ELEGANTE) --- */
+    .hero-area {
+      flex: 1;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      z-index: 10;
+      position: relative;
+    }
+
+    .hero-artwork-frame {
+      position: relative;
+      display: inline-flex;
+      align-items: center;
+      justify-content: center;
+      max-height: 48vh;
+      max-width: 88%;
+      cursor: zoom-in;
+      background: #ffffff;
+      padding: 7px;
+      border-radius: 2px;
+      border: 1px solid rgba(0, 0, 0, 0.06);
+      box-shadow: 
+        0 14px 32px rgba(0, 0, 0, 0.18),
+        0 2px 6px rgba(0, 0, 0, 0.06);
+      transition: transform 0.35s ease, box-shadow 0.35s ease;
+    }
+
+    .hero-artwork-frame:hover {
+      transform: scale(1.015);
+      box-shadow: 
+        0 20px 42px rgba(0, 0, 0, 0.24),
+        0 4px 10px rgba(0, 0, 0, 0.08);
+    }
+
+    .hero-artwork-frame img,
+    .hero-artwork-frame video {
+      display: block;
+      width: auto;
+      height: auto;
+      max-width: 100%;
+      max-height: calc(48vh - 14px);
+      object-fit: contain;
+      border-radius: 1px;
+      opacity: 1;
+      transition: opacity 0.25s ease;
+    }
+
+    .hero-area.loading .hero-artwork-frame {
+      opacity: 0.3;
+    }
+
+    /* --- CAPTION --- */
+    .hero-caption {
+      text-align: center;
+      margin-top: 1.1rem;
+      z-index: 10;
+    }
+
+    .hero-caption .title {
+      font-size: 1.45rem;
+      font-weight: 400;
+      color: var(--ink-dark);
+      letter-spacing: 0.03em;
+      margin-bottom: 0.2rem;
+    }
+
+    .hero-caption .meta {
+      font-family: var(--font-mono);
+      font-size: 0.72rem;
+      letter-spacing: 0.1em;
+      color: var(--ink-muted-dark);
+    }
+
+    /* --- FILMSTRIP (CON MARCO BLANCO) --- */
+    .filmstrip-wrapper {
+      z-index: 10;
+      border-top: 1px solid rgba(0, 0, 0, 0.08);
+      padding-top: 0.9rem;
+      width: 100%;
+    }
+
+    .strip-meta-bar {
+      display: flex;
+      justify-content: space-between;
+      font-family: var(--font-mono);
+      font-size: 0.68rem;
+      letter-spacing: 0.14em;
+      color: var(--ink-muted-dark);
+      text-transform: uppercase;
+      margin-bottom: 0.6rem;
+    }
+
+    .filmstrip {
+      display: flex;
+      gap: 1.2rem;
+      overflow-x: auto;
+      padding: 0.3rem 0.2rem 0.5rem;
+      scrollbar-width: none;
+    }
+
+    .filmstrip::-webkit-scrollbar {
+      display: none;
+    }
+
+    .strip-thumb {
+      flex: 0 0 auto;
+      width: 105px;
+      height: 72px;
+      background: #ffffff;
+      padding: 3px;
+      border: 1px solid rgba(0, 0, 0, 0.12);
+      border-radius: 2px;
+      position: relative;
+      cursor: pointer;
+      overflow: hidden;
+      transition: all 0.25s ease;
+      opacity: 0.7;
+      box-shadow: 0 2px 6px rgba(0, 0, 0, 0.06);
+    }
+
+    .strip-thumb:hover {
+      opacity: 1;
+      border-color: var(--ink-dark);
+      transform: translateY(-2px);
+      box-shadow: 0 4px 10px rgba(0, 0, 0, 0.12);
+    }
+
+    .strip-thumb.active {
+      opacity: 1;
+      border-color: var(--rust);
+      box-shadow: 0 4px 14px rgba(217, 90, 43, 0.35);
+      transform: translateY(-2px);
+    }
+
+    .strip-thumb img {
+      width: 100%;
+      height: 100%;
+      object-fit: cover;
+      display: block;
+      border-radius: 1px;
+    }
+
+    .strip-tag {
+      position: absolute;
+      bottom: 5px;
+      right: 5px;
+      background: rgba(28, 27, 24, 0.88);
+      color: var(--ink-white);
+      font-family: var(--font-mono);
+      font-size: 0.52rem;
+      letter-spacing: 0.08em;
+      padding: 1px 4px;
+      border-radius: 2px;
+      text-transform: uppercase;
+    }
+
+    .strip-tag.vid {
+      color: #ffaa82;
+      border: 1px solid rgba(217, 90, 43, 0.5);
+    }
+
+    /* --- FULLSCREEN LIGHTBOX --- */
+    .lightbox {
+      position: fixed;
+      inset: 0;
+      background: rgba(12, 11, 10, 0.96);
+      backdrop-filter: blur(14px);
+      z-index: 100;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+      opacity: 0;
+      pointer-events: none;
+      transition: opacity 0.35s ease;
+      padding: 2rem;
+      cursor: zoom-out;
+    }
+
+    .lightbox.active {
+      opacity: 1;
+      pointer-events: auto;
+    }
+
+    .lightbox-content {
+      position: relative;
+      max-width: 90vw;
+      max-height: 84vh;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      cursor: default;
+    }
+
+    .lightbox-content img,
+    .lightbox-content video {
+      max-width: 88vw;
+      max-height: 78vh;
+      width: auto;
+      height: auto;
+      object-fit: contain;
+      box-shadow: 0 25px 65px rgba(0, 0, 0, 0.95);
+      border-radius: 2px;
+      transform: scale(0.96);
+      transition: transform 0.35s cubic-bezier(0.16, 1, 0.3, 1);
+    }
+
+    .lightbox.active .lightbox-content img,
+    .lightbox.active .lightbox-content video {
+      transform: scale(1);
+    }
+
+    .lightbox-caption {
+      margin-top: 1.2rem;
+      color: var(--ink-white);
+      font-family: var(--font-serif);
+      font-size: 1.3rem;
+      text-align: center;
+    }
+
+    .lightbox-caption span {
+      display: block;
+      font-family: var(--font-mono);
+      font-size: 0.7rem;
+      color: var(--rust);
+      letter-spacing: 0.12em;
+      margin-top: 0.3rem;
+    }
+
+    .lightbox-close {
+      position: absolute;
+      top: 2rem;
+      right: 2.5rem;
+      background: none;
+      border: none;
+      color: var(--ink-muted);
+      font-family: var(--font-mono);
+      font-size: 0.8rem;
+      letter-spacing: 0.15em;
+      cursor: pointer;
+      text-transform: uppercase;
+      transition: color 0.2s ease;
+    }
+
+    .lightbox-close:hover {
+      color: var(--ink-white);
+    }
+
+    /* --- RESPONSIVE --- */
+    @media (max-width: 960px) {
+      body {
+        height: auto;
+        overflow-y: auto;
+      }
+      main {
+        flex-direction: column;
+      }
+      aside.collections-panel {
+        width: 100%;
+        border-right: none;
+        border-bottom: 1px solid var(--panel-border);
+      }
+      .stage-wrapper {
+        padding: 1.5rem 1rem;
+      }
+      .stretched-canvas {
+        padding: 1.5rem 1.2rem;
+      }
+    }
+    /* --- MENÚ DESPLEGABLE UNIVERSAL --- */
+    .dropdown { position: relative; }
+    .dropdown-content {
+      display: none; position: absolute; top: 100%; left: -15px;
+      background-color: #0a0908; min-width: 140px;
+      box-shadow: 0 15px 35px rgba(0,0,0,0.8);
+      border: 1px solid #211e19; border-radius: 2px;
+      z-index: 100; overflow: hidden;
+    }
+    .dropdown:hover .dropdown-content { display: block; }
+    .dropdown-content a {
+      color: #8c877c; padding: 12px 18px; text-decoration: none;
+      display: block; font-family: 'IBM Plex Mono', monospace; font-size: 0.65rem;
+      border-bottom: 1px solid #1a1714; transition: background 0.2s, color 0.2s;
+    }
+    .dropdown-content a:last-child { border-bottom: none; }
+    .dropdown-content a:hover {
+      background-color: #161411; color: #f4f0e6;
+    }
+  </style>
+</head>
+<body>
 
 <header>
     <div class="brand">Paloma</div>
@@ -72,7 +598,7 @@
         <li class="dropdown">
           <a href="visual.html" class="active">Visual</a>
           <div class="dropdown-content">
-            <a href="photography.html">Photography</a>
+            <a href="visual.html">Photography</a>
             <a href="illustration.html">Illustration</a>
             <a href="drawings.html">Drawings</a>
             <a href="collages.html">Collages</a>
